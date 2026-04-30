@@ -12,8 +12,19 @@ export function GoalsDashboardScreen() {
   const theme = useAppTheme();
   const { error, goals, isLoading, refresh } = useGoalsList();
 
+  const footer = (
+    <FloatingActionBar>
+      <IconButton
+        accessibilityLabel="Создать цель"
+        icon={Plus}
+        label="Новая цель"
+        onPress={() => router.push('/goals/new')}
+      />
+    </FloatingActionBar>
+  );
+
   return (
-    <AppScreen scroll>
+    <AppScreen footer={footer} scroll>
       <PageHeader title="Цели" />
 
       {error ? (
@@ -51,14 +62,6 @@ export function GoalsDashboardScreen() {
         />
       )}
 
-      <FloatingActionBar>
-        <IconButton
-          accessibilityLabel="Создать цель"
-          icon={Plus}
-          label="Новая цель"
-          onPress={() => router.push('/goals/new')}
-        />
-      </FloatingActionBar>
     </AppScreen>
   );
 }

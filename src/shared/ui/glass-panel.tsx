@@ -2,8 +2,6 @@ import { BlurView } from 'expo-blur';
 import type { PropsWithChildren } from 'react';
 import {
   Platform,
-  Pressable,
-  type PressableProps,
   type StyleProp,
   StyleSheet,
   useColorScheme,
@@ -13,15 +11,14 @@ import {
 import { colors, radii, resolveColorScheme, spacing } from '@/shared/theme';
 
 type GlassPanelProps = PropsWithChildren<{
-  accessibilityRole?: PressableProps['accessibilityRole'];
-  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 }>;
 
-export function GlassPanel({ accessibilityRole, children, onPress, style }: GlassPanelProps) {
+export function GlassPanel({ children, style }: GlassPanelProps) {
   const scheme = resolveColorScheme(useColorScheme());
   const palette = colors[scheme];
-  const content = (
+
+  return (
     <BlurView
       intensity={Platform.OS === 'ios' ? 28 : 0}
       tint={scheme}
@@ -36,16 +33,6 @@ export function GlassPanel({ accessibilityRole, children, onPress, style }: Glas
     >
       {children}
     </BlurView>
-  );
-
-  if (!onPress) {
-    return content;
-  }
-
-  return (
-    <Pressable accessibilityRole={accessibilityRole} onPress={onPress}>
-      {content}
-    </Pressable>
   );
 }
 

@@ -1,5 +1,5 @@
 import { CalendarCheck2, MoreHorizontal } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Goal, GoalStats } from '@/features/goals/domain/types';
 import { radii, spacing, typography, useAppTheme } from '@/shared/theme';
@@ -16,16 +16,16 @@ export function GoalCard({ goal, stats, onPress, onMenuPress }: GoalCardProps) {
   const theme = useAppTheme();
 
   return (
-    <GlassPanel accessibilityRole="button" onPress={onPress} style={styles.card}>
+    <GlassPanel style={styles.card}>
       <View style={styles.header}>
-        <View style={styles.titleBlock}>
+        <Pressable accessibilityRole="button" onPress={onPress} style={styles.titleBlock}>
           <Text style={[styles.title, { color: theme.text }]}>{goal.title}</Text>
           {goal.description ? (
             <Text style={[styles.description, { color: theme.textSecondary }]}>
               {goal.description}
             </Text>
           ) : null}
-        </View>
+        </Pressable>
         <IconButton
           accessibilityLabel="Действия с целью"
           icon={MoreHorizontal}
@@ -34,7 +34,7 @@ export function GoalCard({ goal, stats, onPress, onMenuPress }: GoalCardProps) {
         />
       </View>
 
-      <View style={styles.footer}>
+      <Pressable accessibilityRole="button" onPress={onPress} style={styles.footer}>
         <View style={[styles.statPill, { backgroundColor: theme.accentSoft }]}>
           <CalendarCheck2 color={theme.accent} size={16} strokeWidth={2.4} />
           <Text style={[styles.statText, { color: theme.accent }]}>
@@ -44,7 +44,7 @@ export function GoalCard({ goal, stats, onPress, onMenuPress }: GoalCardProps) {
         <Text style={[styles.status, { color: theme.textSecondary }]}>
           {statusLabels[goal.status]}
         </Text>
-      </View>
+      </Pressable>
     </GlassPanel>
   );
 }

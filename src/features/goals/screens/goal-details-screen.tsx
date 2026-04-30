@@ -15,8 +15,23 @@ export function GoalDetailsScreen() {
   const theme = useAppTheme();
   const { error, goal, isLoading } = useGoal(goalId);
 
+  const footer = (
+    <FloatingActionBar>
+      <IconButton
+        accessibilityLabel="Редактировать цель"
+        icon={Edit3}
+        label="Редактировать"
+        onPress={() => {
+          if (goalId) {
+            router.push({ pathname: '/goals/[id]/edit', params: { id: goalId } });
+          }
+        }}
+      />
+    </FloatingActionBar>
+  );
+
   return (
-    <AppScreen scroll>
+    <AppScreen footer={footer} scroll>
       <PageHeader
         title={goal?.title ?? (isLoading ? 'Загрузка...' : 'Детали цели')}
         subtitle={goal?.description ?? undefined}
@@ -27,18 +42,6 @@ export function GoalDetailsScreen() {
       ) : null}
       <GoalStatsPlaceholder />
       <GoalCalendarPlaceholder />
-      <FloatingActionBar>
-        <IconButton
-          accessibilityLabel="Редактировать цель"
-          icon={Edit3}
-          label="Редактировать"
-          onPress={() => {
-            if (goalId) {
-              router.push({ pathname: '/goals/[id]/edit', params: { id: goalId } });
-            }
-          }}
-        />
-      </FloatingActionBar>
     </AppScreen>
   );
 }
