@@ -43,6 +43,9 @@ export function GoalsDashboardScreen() {
               goal={goal}
               key={goal.id}
               onPress={() => router.push({ pathname: '/goals/[id]', params: { id: goal.id } })}
+              onMenuPress={() =>
+                router.push({ pathname: '/goals/[id]/edit', params: { id: goal.id } })
+              }
               stats={{
                 bestStreak: 0,
                 completionRate: 0,
