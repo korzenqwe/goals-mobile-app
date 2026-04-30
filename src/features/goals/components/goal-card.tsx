@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
     gap: spacing.one,
   },
   title: {
-    fontSize: typography.title.fontSize,
-    fontWeight: typography.title.fontWeight,
+    fontSize: typography.subtitle.fontSize,
+    fontWeight: typography.subtitle.fontWeight,
   },
   description: {
     fontSize: typography.body.fontSize,

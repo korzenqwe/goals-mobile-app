@@ -5,6 +5,7 @@ import { colors, radii, resolveColorScheme, spacing, typography } from '@/shared
 
 type IconButtonProps = {
   accessibilityLabel?: string;
+  disabled?: boolean;
   icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
   label?: string;
   onPress?: () => void;
@@ -13,6 +14,7 @@ type IconButtonProps = {
 
 export function IconButton({
   accessibilityLabel,
+  disabled = false,
   icon: Icon,
   label,
   onPress,
@@ -27,12 +29,13 @@ export function IconButton({
     <Pressable
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="button"
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
         {
           backgroundColor: isGhost ? 'transparent' : palette.accent,
-          opacity: pressed ? 0.72 : 1,
+          opacity: disabled ? 0.42 : pressed ? 0.72 : 1,
         },
       ]}
     >
