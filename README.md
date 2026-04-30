@@ -32,3 +32,13 @@ This project targets development builds, not Expo Go.
 - TypeScript
 - Bun
 - Expo development build
+
+## Project Structure
+
+- `src/app`: Expo Router route files only.
+- `src/features/goals`: goal screens, components, and domain contracts.
+- `src/shared/db`: SQLite-facing schema constants, migrations, and repository contracts.
+- `src/shared/date`: local calendar date contracts and future date helpers.
+- `src/shared/theme`: shared visual tokens.
+- `src/shared/ui`: reusable app UI primitives.
+- `src/shared/reminders`: placeholder for future reminders work.

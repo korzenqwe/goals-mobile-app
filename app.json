@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile-app",
-    "slug": "mobile-app",
+    "name": "Goals",
+    "slug": "goals-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobileapp",
+    "scheme": "goals",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
