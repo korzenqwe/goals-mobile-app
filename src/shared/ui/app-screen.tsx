@@ -1,17 +1,17 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import type { PropsWithChildren, ReactNode } from 'react'
+import { ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { colors, resolveColorScheme, spacing } from '@/shared/theme';
+import { colors, resolveColorScheme, spacing } from '@/shared/theme'
 
 type AppScreenProps = PropsWithChildren<{
-  footer?: ReactNode;
-  scroll?: boolean;
-}>;
+  footer?: ReactNode
+  scroll?: boolean
+}>
 
 export function AppScreen({ children, footer, scroll = false }: AppScreenProps) {
-  const scheme = resolveColorScheme(useColorScheme());
-  const backgroundColor = colors[scheme].background;
+  const scheme = resolveColorScheme(useColorScheme())
+  const backgroundColor = colors[scheme].background
 
   if (scroll) {
     return (
@@ -23,7 +23,7 @@ export function AppScreen({ children, footer, scroll = false }: AppScreenProps) 
           {footer}
         </View>
       </SafeAreaView>
-    );
+    )
   }
 
   return (
@@ -33,7 +33,7 @@ export function AppScreen({ children, footer, scroll = false }: AppScreenProps) 
         {footer}
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
     paddingTop: spacing.four,
     paddingBottom: spacing.seven + spacing.six,
   },
-});
+})

@@ -1,11 +1,11 @@
-import { CalendarDays } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { CalendarDays } from 'lucide-react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme';
-import { GlassPanel } from '@/shared/ui';
+import { spacing, typography, useAppTheme } from '@/shared/theme'
+import { GlassPanel } from '@/shared/ui'
 
 export function GoalCalendarPlaceholder() {
-  const theme = useAppTheme();
+  const theme = useAppTheme()
 
   return (
     <GlassPanel style={styles.panel}>
@@ -17,7 +17,7 @@ export function GoalCalendarPlaceholder() {
         История выполнения появится здесь.
       </Text>
     </GlassPanel>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
     fontSize: typography.body.fontSize,
     lineHeight: typography.body.lineHeight,
   },
-});
+})

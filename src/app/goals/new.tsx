@@ -1,1 +1,1 @@
-export { NewGoalScreen as default } from '@/features/goals';
+export { NewGoalScreen as default } from '@/features/goals'

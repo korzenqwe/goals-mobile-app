@@ -1,1 +1,1 @@
-export { EditGoalScreen as default } from '@/features/goals';
+export { EditGoalScreen as default } from '@/features/goals'

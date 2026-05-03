@@ -1,5 +1,5 @@
-import type { ColorSchemeName, TextStyle } from 'react-native';
-import { useColorScheme } from 'react-native';
+import type { ColorSchemeName, TextStyle } from 'react-native'
+import { useColorScheme } from 'react-native'
 
 export const colors = {
   light: {
@@ -26,7 +26,7 @@ export const colors = {
     accentSoft: 'rgba(100,210,255,0.16)',
     danger: '#FF6961',
   },
-} as const;
+} as const
 
 export const spacing = {
   one: 4,
@@ -36,14 +36,14 @@ export const spacing = {
   five: 24,
   six: 32,
   seven: 48,
-} as const;
+} as const
 
 export const radii = {
   small: 8,
   medium: 12,
   large: 18,
   full: 999,
-} as const;
+} as const
 
 export const typography = {
   title: {
@@ -66,12 +66,16 @@ export const typography = {
     lineHeight: 18,
     fontWeight: '500',
   },
-} satisfies Record<string, TextStyle>;
+} satisfies Record<string, TextStyle>
 
 export function resolveColorScheme(colorScheme: ColorSchemeName) {
-  return colorScheme === 'dark' ? 'dark' : 'light';
+  if (colorScheme === 'dark') {
+    return 'dark'
+  }
+
+  return 'light'
 }
 
 export function useAppTheme() {
-  return colors[resolveColorScheme(useColorScheme())];
+  return colors[resolveColorScheme(useColorScheme())]
 }

@@ -1,1 +1,1 @@
-export { GoalsDashboardScreen as default } from '@/features/goals';
+export { GoalsDashboardScreen as default } from '@/features/goals'

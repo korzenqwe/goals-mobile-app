@@ -1,22 +1,22 @@
-import { Check } from 'lucide-react-native';
-import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Check } from 'lucide-react-native'
+import { useState } from 'react'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme';
-import { GlassPanel, IconButton } from '@/shared/ui';
+import { spacing, typography, useAppTheme } from '@/shared/theme'
+import { GlassPanel, IconButton } from '@/shared/ui'
 
 export type GoalFormValues = {
-  title: string;
-  description: string | null;
-};
+  title: string
+  description: string | null
+}
 
 type GoalFormProps = {
-  error?: string | null;
-  initialValues?: Partial<GoalFormValues>;
-  isSubmitting?: boolean;
-  onSubmit: (values: GoalFormValues) => void;
-  submitLabel: string;
-};
+  error?: string | null
+  initialValues?: Partial<GoalFormValues>
+  isSubmitting?: boolean
+  onSubmit: (values: GoalFormValues) => Promise<void> | void
+  submitLabel: string
+}
 
 export function GoalForm({
   error,
@@ -25,10 +25,20 @@ export function GoalForm({
   onSubmit,
   submitLabel,
 }: GoalFormProps) {
-  const theme = useAppTheme();
-  const [title, setTitle] = useState(initialValues?.title ?? '');
-  const [description, setDescription] = useState(initialValues?.description ?? '');
-  const canSubmit = title.trim().length > 0 && !isSubmitting;
+  const theme = useAppTheme()
+  const [title, setTitle] = useState(initialValues?.title ?? '')
+  const [description, setDescription] = useState(initialValues?.description ?? '')
+  const canSubmit = title.trim().length > 0 && !isSubmitting
+  let errorContent = null
+  let submitButtonLabel = submitLabel
+
+  if (error) {
+    errorContent = <Text style={[styles.error, { color: theme.danger }]}>{error}</Text>
+  }
+
+  if (isSubmitting) {
+    submitButtonLabel = 'Сохраняем...'
+  }
 
   return (
     <GlassPanel style={styles.panel}>
@@ -75,22 +85,22 @@ export function GoalForm({
         />
       </View>
 
-      {error ? <Text style={[styles.error, { color: theme.danger }]}>{error}</Text> : null}
+      {errorContent}
 
       <IconButton
         accessibilityLabel={submitLabel}
         disabled={!canSubmit}
         icon={Check}
-        label={isSubmitting ? 'Сохраняем...' : submitLabel}
-        onPress={() =>
-          onSubmit({
+        label={submitButtonLabel}
+        onPress={() => {
+          void onSubmit({
             title: title.trim(),
             description: description.trim() || null,
           })
-        }
+        }}
       />
     </GlassPanel>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -120,4 +130,4 @@ const styles = StyleSheet.create({
     fontSize: typography.caption.fontSize,
     lineHeight: typography.caption.lineHeight,
   },
-});
+})

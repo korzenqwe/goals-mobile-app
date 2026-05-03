@@ -1,15 +1,15 @@
-import type { PropsWithChildren } from 'react';
-import { StyleSheet, View } from 'react-native';
+import type { PropsWithChildren } from 'react'
+import { StyleSheet, View } from 'react-native'
 
-import { spacing } from '@/shared/theme';
-import { GlassPanel } from '@/shared/ui/glass-panel';
+import { spacing } from '@/shared/theme'
+import { GlassPanel } from '@/shared/ui/glass-panel'
 
 export function FloatingActionBar({ children }: PropsWithChildren) {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
       <GlassPanel style={styles.bar}>{children}</GlassPanel>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -23,7 +23,9 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
     gap: spacing.two,
     padding: spacing.two,
   },
-});
+})

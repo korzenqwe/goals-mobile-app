@@ -6,93 +6,114 @@ import type {
   GoalStatus,
   ToggleCompletionInput,
   UpdateGoalInput,
-} from '@/features/goals/domain/types';
-import type { DateRange, LocalDateString } from '@/shared/date';
-import { getDatabaseAsync } from '@/shared/db/database';
+} from '@/features/goals/domain/types'
+import {
+  calculateCompletionStats,
+  type DateRange,
+  getLocalDateString,
+  type LocalDateString,
+} from '@/shared/date'
+import { getDatabaseAsync } from '@/shared/db/database'
 
 export type ListGoalsParams = {
-  status?: GoalStatus;
-  includeArchived?: boolean;
-};
+  status?: GoalStatus
+  includeArchived?: boolean
+}
 
 export interface GoalsRepository {
-  listGoals(params?: ListGoalsParams): Promise<Goal[]>;
-  getGoal(id: string): Promise<Goal | null>;
-  createGoal(input: CreateGoalInput): Promise<Goal>;
-  updateGoal(id: string, input: UpdateGoalInput): Promise<Goal>;
-  pauseGoal(id: string): Promise<Goal>;
-  unpauseGoal(id: string): Promise<Goal>;
-  archiveGoal(id: string): Promise<Goal>;
-  listCompletions(goalId: string, range?: DateRange): Promise<GoalCompletion[]>;
-  toggleCompletion(input: ToggleCompletionInput): Promise<GoalCompletion | null>;
+  listGoals(params?: ListGoalsParams): Promise<Goal[]>
+  getGoal(id: string): Promise<Goal | null>
+  createGoal(input: CreateGoalInput): Promise<Goal>
+  updateGoal(id: string, input: UpdateGoalInput): Promise<Goal>
+  pauseGoal(id: string): Promise<Goal>
+  unpauseGoal(id: string): Promise<Goal>
+  archiveGoal(id: string): Promise<Goal>
+  deleteGoal(id: string): Promise<void>
+  listCompletions(goalId: string, range?: DateRange): Promise<GoalCompletion[]>
+  isCompletedOn(goalId: string, date: LocalDateString): Promise<boolean>
+  toggleCompletion(input: ToggleCompletionInput): Promise<GoalCompletion | null>
   updateCompletionNote(
     goalId: string,
     date: LocalDateString,
     note: string | null,
-  ): Promise<GoalCompletion>;
-  getGoalStats(goalId: string): Promise<GoalStats>;
+  ): Promise<GoalCompletion>
+  getGoalStats(goalId: string): Promise<GoalStats>
 }
 
 type GoalRow = {
-  id: string;
-  title: string;
-  description: string | null;
-  status: GoalStatus;
-  created_at: string;
-  updated_at: string;
-  paused_at: string | null;
-  archived_at: string | null;
-};
+  id: string
+  title: string
+  description: string | null
+  status: GoalStatus
+  created_at: string
+  updated_at: string
+  paused_at: string | null
+  archived_at: string | null
+}
 
 type CompletionRow = {
-  id: string;
-  goal_id: string;
-  date: LocalDateString;
-  note: string | null;
-  created_at: string;
-};
+  id: string
+  goal_id: string
+  date: LocalDateString
+  note: string | null
+  created_at: string
+}
 
 class SQLiteGoalsRepository implements GoalsRepository {
   async listGoals(params: ListGoalsParams = {}) {
-    const database = await getDatabaseAsync();
-    const includeArchived = params.includeArchived ?? false;
-    const rows = params.status
-      ? await database.getAllAsync<GoalRow>(
-          `
+    const database = await getDatabaseAsync()
+    const includeArchived = params.includeArchived ?? false
+    let rows: GoalRow[]
+
+    if (params.status) {
+      rows = await database.getAllAsync<GoalRow>(
+        `
           SELECT * FROM goals
           WHERE status = ?
           ORDER BY updated_at DESC;
         `,
-          params.status,
-        )
-      : await database.getAllAsync<GoalRow>(
-          `
+        params.status,
+      )
+    } else {
+      let includeArchivedValue = 0
+
+      if (includeArchived) {
+        includeArchivedValue = 1
+      }
+
+      rows = await database.getAllAsync<GoalRow>(
+        `
           SELECT * FROM goals
           WHERE (? = 1 OR status != 'archived')
           ORDER BY updated_at DESC;
         `,
-          includeArchived ? 1 : 0,
-        );
+        includeArchivedValue,
+      )
+    }
 
-    return rows.map(mapGoalRow);
+    return rows.map(mapGoalRow)
   }
 
   async getGoal(id: string) {
-    const database = await getDatabaseAsync();
-    const row = await database.getFirstAsync<GoalRow>('SELECT * FROM goals WHERE id = ?;', id);
+    const database = await getDatabaseAsync()
+    const row = await database.getFirstAsync<GoalRow>('SELECT * FROM goals WHERE id = ?;', id)
 
-    return row ? mapGoalRow(row) : null;
+    if (row) {
+      return mapGoalRow(row)
+    }
+
+    return null
   }
 
   async createGoal(input: CreateGoalInput) {
-    const title = input.title.trim();
+    const title = input.title.trim()
 
     if (!title) {
-      throw new Error('Введите название цели.');
+      throw new Error('Введите название цели.')
     }
 
-    const database = await getDatabaseAsync();
-    const now = new Date().toISOString();
+    const database = await getDatabaseAsync()
+    const now = new Date().toISOString()
     const goal: Goal = {
       id: createId('goal'),
       title,
@@ -102,7 +123,7 @@ class SQLiteGoalsRepository implements GoalsRepository {
       updatedAt: now,
       pausedAt: null,
       archivedAt: null,
-    };
+    }
 
     await database.runAsync(
       `
@@ -118,26 +139,35 @@ class SQLiteGoalsRepository implements GoalsRepository {
       goal.updatedAt,
       goal.pausedAt,
       goal.archivedAt,
-    );
+    )
 
-    return goal;
+    return goal
   }
 
   async updateGoal(id: string, input: UpdateGoalInput) {
-    const existing = await this.getGoal(id);
+    const existing = await this.getGoal(id)
 
     if (!existing) {
-      throw new Error('Цель не найдена.');
+      throw new Error('Цель не найдена.')
     }
 
-    const title = input.title === undefined ? existing.title : input.title.trim();
+    let title = existing.title
+
+    if (input.title !== undefined) {
+      title = input.title.trim()
+    }
 
     if (!title) {
-      throw new Error('Введите название цели.');
+      throw new Error('Введите название цели.')
     }
 
-    const database = await getDatabaseAsync();
-    const updatedAt = new Date().toISOString();
+    const database = await getDatabaseAsync()
+    const updatedAt = new Date().toISOString()
+    let description = existing.description
+
+    if (input.description !== undefined) {
+      description = normalizeNullableText(input.description)
+    }
 
     await database.runAsync(
       `
@@ -146,61 +176,89 @@ class SQLiteGoalsRepository implements GoalsRepository {
       WHERE id = ?;
     `,
       title,
-      input.description === undefined
-        ? existing.description
-        : normalizeNullableText(input.description),
+      description,
       updatedAt,
       id,
-    );
+    )
 
-    const updatedGoal = await this.getGoal(id);
+    const updatedGoal = await this.getGoal(id)
 
     if (!updatedGoal) {
-      throw new Error('Цель не найдена.');
+      throw new Error('Цель не найдена.')
     }
 
-    return updatedGoal;
+    return updatedGoal
   }
 
   async pauseGoal(id: string) {
-    return this.setGoalStatus(id, 'paused');
+    return this.setGoalStatus(id, 'paused')
   }
 
   async unpauseGoal(id: string) {
-    return this.setGoalStatus(id, 'active');
+    return this.setGoalStatus(id, 'active')
   }
 
   async archiveGoal(id: string) {
-    return this.setGoalStatus(id, 'archived');
+    return this.setGoalStatus(id, 'archived')
+  }
+
+  async deleteGoal(id: string) {
+    const existing = await this.getGoal(id)
+
+    if (!existing) {
+      throw new Error('Цель не найдена.')
+    }
+
+    const database = await getDatabaseAsync()
+    await database.runAsync('DELETE FROM goals WHERE id = ?;', id)
   }
 
   async listCompletions(goalId: string, range?: DateRange) {
-    const database = await getDatabaseAsync();
-    const rows = range
-      ? await database.getAllAsync<CompletionRow>(
-          `
+    const database = await getDatabaseAsync()
+    let rows: CompletionRow[]
+
+    if (range) {
+      rows = await database.getAllAsync<CompletionRow>(
+        `
           SELECT * FROM goal_completions
           WHERE goal_id = ? AND date BETWEEN ? AND ?
           ORDER BY date DESC;
         `,
-          goalId,
-          range.start,
-          range.end,
-        )
-      : await database.getAllAsync<CompletionRow>(
-          `
+        goalId,
+        range.start,
+        range.end,
+      )
+    } else {
+      rows = await database.getAllAsync<CompletionRow>(
+        `
           SELECT * FROM goal_completions
           WHERE goal_id = ?
           ORDER BY date DESC;
         `,
-          goalId,
-        );
+        goalId,
+      )
+    }
 
-    return rows.map(mapCompletionRow);
+    return rows.map(mapCompletionRow)
+  }
+
+  async isCompletedOn(goalId: string, date: LocalDateString) {
+    const database = await getDatabaseAsync()
+    const row = await database.getFirstAsync<{ id: string }>(
+      `
+      SELECT id FROM goal_completions
+      WHERE goal_id = ? AND date = ?
+      LIMIT 1;
+    `,
+      goalId,
+      date,
+    )
+
+    return Boolean(row)
   }
 
   async toggleCompletion(input: ToggleCompletionInput) {
-    const database = await getDatabaseAsync();
+    const database = await getDatabaseAsync()
     const existing = await database.getFirstAsync<CompletionRow>(
       `
       SELECT * FROM goal_completions
@@ -208,21 +266,21 @@ class SQLiteGoalsRepository implements GoalsRepository {
     `,
       input.goalId,
       input.date,
-    );
+    )
 
     if (existing) {
-      await database.runAsync('DELETE FROM goal_completions WHERE id = ?;', existing.id);
-      return null;
+      await database.runAsync('DELETE FROM goal_completions WHERE id = ?;', existing.id)
+      return null
     }
 
-    const now = new Date().toISOString();
+    const now = new Date().toISOString()
     const completion: GoalCompletion = {
       id: createId('completion'),
       goalId: input.goalId,
       date: input.date,
       note: normalizeNullableText(input.note),
       createdAt: now,
-    };
+    }
 
     await database.runAsync(
       `
@@ -234,13 +292,13 @@ class SQLiteGoalsRepository implements GoalsRepository {
       completion.date,
       completion.note,
       completion.createdAt,
-    );
+    )
 
-    return completion;
+    return completion
   }
 
   async updateCompletionNote(goalId: string, date: LocalDateString, note: string | null) {
-    const database = await getDatabaseAsync();
+    const database = await getDatabaseAsync()
     const existing = await database.getFirstAsync<CompletionRow>(
       `
       SELECT * FROM goal_completions
@@ -248,44 +306,59 @@ class SQLiteGoalsRepository implements GoalsRepository {
     `,
       goalId,
       date,
-    );
+    )
 
     if (!existing) {
-      throw new Error('День не отмечен.');
+      throw new Error('День не отмечен.')
     }
 
     await database.runAsync(
       'UPDATE goal_completions SET note = ? WHERE id = ?;',
       normalizeNullableText(note),
       existing.id,
-    );
+    )
 
     const updated = await database.getFirstAsync<CompletionRow>(
       'SELECT * FROM goal_completions WHERE id = ?;',
       existing.id,
-    );
+    )
 
     if (!updated) {
-      throw new Error('День не найден.');
+      throw new Error('День не найден.')
     }
 
-    return mapCompletionRow(updated);
+    return mapCompletionRow(updated)
   }
 
-  async getGoalStats(_goalId: string) {
-    return {
-      currentStreak: 0,
-      bestStreak: 0,
-      currentMonthCompletionCount: 0,
-      completionRate: 0,
-    };
+  async getGoalStats(goalId: string) {
+    const goal = await this.getGoal(goalId)
+
+    if (!goal) {
+      throw new Error('Цель не найдена.')
+    }
+
+    const completions = await this.listCompletions(goalId)
+
+    return calculateCompletionStats({
+      completedDates: completions.map((completion) => completion.date),
+      createdAt: goal.createdAt,
+      today: getLocalDateString(),
+    })
   }
 
   private async setGoalStatus(id: string, status: GoalStatus) {
-    const database = await getDatabaseAsync();
-    const now = new Date().toISOString();
-    const pausedAt = status === 'paused' ? now : null;
-    const archivedAt = status === 'archived' ? now : null;
+    const database = await getDatabaseAsync()
+    const now = new Date().toISOString()
+    let pausedAt = null
+    let archivedAt = null
+
+    if (status === 'paused') {
+      pausedAt = now
+    }
+
+    if (status === 'archived') {
+      archivedAt = now
+    }
 
     await database.runAsync(
       `
@@ -298,19 +371,19 @@ class SQLiteGoalsRepository implements GoalsRepository {
       pausedAt,
       archivedAt,
       id,
-    );
+    )
 
-    const goal = await this.getGoal(id);
+    const goal = await this.getGoal(id)
 
     if (!goal) {
-      throw new Error('Цель не найдена.');
+      throw new Error('Цель не найдена.')
     }
 
-    return goal;
+    return goal
   }
 }
 
-export const goalsRepository: GoalsRepository = new SQLiteGoalsRepository();
+export const goalsRepository: GoalsRepository = new SQLiteGoalsRepository()
 
 function mapGoalRow(row: GoalRow): Goal {
   return {
@@ -322,7 +395,7 @@ function mapGoalRow(row: GoalRow): Goal {
     updatedAt: row.updated_at,
     pausedAt: row.paused_at,
     archivedAt: row.archived_at,
-  };
+  }
 }
 
 function mapCompletionRow(row: CompletionRow): GoalCompletion {
@@ -332,15 +405,15 @@ function mapCompletionRow(row: CompletionRow): GoalCompletion {
     date: row.date,
     note: row.note,
     createdAt: row.created_at,
-  };
+  }
 }
 
 function normalizeNullableText(value?: string | null) {
-  const normalized = value?.trim();
+  const normalized = value?.trim()
 
-  return normalized ? normalized : null;
+  return normalized || null
 }
 
 function createId(prefix: string) {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
 }

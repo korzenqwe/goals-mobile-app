@@ -1,59 +1,124 @@
-import { CalendarCheck2, MoreHorizontal } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { CalendarCheck2, CheckCircle2, Circle, MoreHorizontal } from 'lucide-react-native'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 
-import type { Goal, GoalStats } from '@/features/goals/domain/types';
-import { radii, spacing, typography, useAppTheme } from '@/shared/theme';
-import { GlassPanel, IconButton } from '@/shared/ui';
+import type { Goal, GoalStats } from '@/features/goals/domain/types'
+import { radii, spacing, typography, useAppTheme } from '@/shared/theme'
+import { GlassPanel, IconButton } from '@/shared/ui'
 
 type GoalCardProps = {
-  goal: Goal;
-  stats?: GoalStats;
-  onPress?: () => void;
-  onMenuPress?: () => void;
-};
+  goal: Goal
+  isCompletedToday?: boolean
+  isTogglingToday?: boolean
+  isUpdating?: boolean
+  stats?: GoalStats
+  onPress?: () => void
+  onMenuPress?: () => void
+  onToggleToday?: () => void
+}
 
-export function GoalCard({ goal, stats, onPress, onMenuPress }: GoalCardProps) {
-  const theme = useAppTheme();
+export function GoalCard({
+  goal,
+  isCompletedToday = false,
+  isTogglingToday = false,
+  isUpdating = false,
+  stats,
+  onPress,
+  onMenuPress,
+  onToggleToday,
+}: GoalCardProps) {
+  const theme = useAppTheme()
+  const cardStyle: StyleProp<ViewStyle> = [styles.card]
+  let CompletionIcon = Circle
+  let completionAccessibilityLabel = 'Отметить сегодня'
+  let completionLabel = 'Отметить'
+  let completionVariant: 'ghost' | 'primary' = 'primary'
+  let descriptionContent = null
+  let updatingIndicator = null
+
+  if (isCompletedToday) {
+    CompletionIcon = CheckCircle2
+    completionAccessibilityLabel = 'Снять отметку за сегодня'
+    completionLabel = 'Снять отметку'
+    completionVariant = 'ghost'
+  }
+
+  if (isUpdating) {
+    cardStyle.push({
+      backgroundColor: theme.accentSoft,
+      borderColor: theme.accent,
+    })
+    completionLabel = 'Обновляем...'
+    updatingIndicator = <ActivityIndicator color={theme.accent} size="small" />
+  }
+
+  if (goal.description) {
+    descriptionContent = (
+      <Text style={[styles.description, { color: theme.textSecondary }]}>
+        {goal.description}
+      </Text>
+    )
+  }
 
   return (
-    <GlassPanel style={styles.card}>
+    <GlassPanel style={cardStyle}>
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" onPress={onPress} style={styles.titleBlock}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={isUpdating}
+          onPress={onPress}
+          style={styles.titleBlock}
+        >
           <Text style={[styles.title, { color: theme.text }]}>{goal.title}</Text>
-          {goal.description ? (
-            <Text style={[styles.description, { color: theme.textSecondary }]}>
-              {goal.description}
-            </Text>
-          ) : null}
+          {descriptionContent}
         </Pressable>
-        <IconButton
-          accessibilityLabel="Действия с целью"
-          icon={MoreHorizontal}
-          onPress={onMenuPress}
-          variant="ghost"
-        />
+        <View style={styles.headerActions}>
+          {updatingIndicator}
+          <IconButton
+            accessibilityLabel="Действия с целью"
+            disabled={isUpdating}
+            icon={MoreHorizontal}
+            onPress={onMenuPress}
+            variant="ghost"
+          />
+        </View>
       </View>
 
-      <Pressable accessibilityRole="button" onPress={onPress} style={styles.footer}>
-        <View style={[styles.statPill, { backgroundColor: theme.accentSoft }]}>
-          <CalendarCheck2 color={theme.accent} size={16} strokeWidth={2.4} />
-          <Text style={[styles.statText, { color: theme.accent }]}>
-            {stats?.currentStreak ?? 0} дней
+      <View style={styles.footer}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={isUpdating}
+          onPress={onPress}
+          style={styles.footerInfo}
+        >
+          <View style={[styles.statPill, { backgroundColor: theme.accentSoft }]}>
+            <CalendarCheck2 color={theme.accent} size={16} strokeWidth={2.4} />
+            <Text style={[styles.statText, { color: theme.accent }]}>
+              {stats?.currentStreak ?? 0} дней
+            </Text>
+          </View>
+          <Text style={[styles.status, { color: theme.textSecondary }]}>
+            {statusLabels[goal.status]}
           </Text>
-        </View>
-        <Text style={[styles.status, { color: theme.textSecondary }]}>
-          {statusLabels[goal.status]}
-        </Text>
-      </Pressable>
+        </Pressable>
+        <IconButton
+          accessibilityLabel={completionAccessibilityLabel}
+          disabled={isTogglingToday || isUpdating || !onToggleToday}
+          icon={CompletionIcon}
+          label={completionLabel}
+          onPress={onToggleToday}
+          variant={completionVariant}
+        />
+      </View>
     </GlassPanel>
-  );
+  )
 }
 
 const statusLabels: Record<Goal['status'], string> = {
   active: 'Активна',
   paused: 'Пауза',
   archived: 'Архив',
-};
+}
 
 const styles = StyleSheet.create({
   card: {
@@ -69,6 +134,11 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.one,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.one,
+  },
   title: {
     fontSize: typography.subtitle.fontSize,
     fontWeight: typography.subtitle.fontWeight,
@@ -81,6 +151,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.two,
+  },
+  footerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexGrow: 1,
+    flexShrink: 1,
     gap: spacing.two,
   },
   statPill: {
@@ -98,4 +176,4 @@ const styles = StyleSheet.create({
   status: {
     fontSize: typography.caption.fontSize,
   },
-});
+})

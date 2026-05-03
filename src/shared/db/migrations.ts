@@ -1,8 +1,8 @@
 export type SQLiteMigration = {
-  id: number;
-  name: string;
-  sql: string;
-};
+  id: number
+  name: string
+  sql: string
+}
 
 export const migrations: readonly SQLiteMigration[] = [
   {
@@ -36,4 +36,4 @@ export const migrations: readonly SQLiteMigration[] = [
         ON goal_completions (goal_id, date DESC);
     `,
   },
-];
+]
