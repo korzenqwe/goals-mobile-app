@@ -3,6 +3,13 @@ import {
   X,
 } from 'lucide-react-native'
 import {
+  BlurView,
+} from 'expo-blur'
+import {
+  useEffect,
+  useState,
+} from 'react'
+import {
   Modal,
   Pressable,
   StyleSheet,
@@ -49,11 +56,65 @@ export function ConfirmationDialog({
   const theme = useAppTheme()
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
+  const [
+    isMounted,
+    setIsMounted,
+  ] = useState(visible)
+  const [
+    isReady,
+    setIsReady,
+  ] = useState(false)
   let confirmButtonLabel = confirmLabel
+  let overlayOpacity = 0
+  let overlayPointerEvents: 'auto' | 'none' = 'none'
 
   if (isConfirming) {
     confirmButtonLabel = 'Удаляем...'
   }
+
+  if (isReady) {
+    overlayOpacity = 1
+    overlayPointerEvents = 'auto'
+  }
+
+  useEffect(() => {
+    let firstFrame: number | null = null
+    let secondFrame: number | null = null
+    let timeout: ReturnType<typeof setTimeout> | null = null
+
+    if (visible) {
+      setIsMounted(true)
+      setIsReady(false)
+
+      firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => {
+          timeout = setTimeout(() => {
+            setIsReady(true)
+          }, 40)
+        })
+      })
+    } else {
+      setIsReady(false)
+
+      timeout = setTimeout(() => {
+        setIsMounted(false)
+      }, 120)
+    }
+
+    return () => {
+      if (firstFrame !== null) {
+        cancelAnimationFrame(firstFrame)
+      }
+
+      if (secondFrame !== null) {
+        cancelAnimationFrame(secondFrame)
+      }
+
+      if (timeout !== null) {
+        clearTimeout(timeout)
+      }
+    }
+  }, [visible])
 
   function handleCancel() {
     if (!isConfirming) {
@@ -61,15 +122,34 @@ export function ConfirmationDialog({
     }
   }
 
+  if (!isMounted) {
+    return null
+  }
+
   return (
     <Modal
-      animationType="fade"
+      animationType="none"
       onRequestClose={handleCancel}
       transparent
-      visible={visible}
+      visible={isMounted}
       statusBarTranslucent
     >
-      <View accessibilityViewIsModal style={styles.overlay}>
+      <View
+        accessibilityViewIsModal={isReady}
+        pointerEvents={overlayPointerEvents}
+        style={[
+          styles.overlay,
+          {
+            opacity: overlayOpacity,
+          },
+        ]}
+      >
+        <BlurView
+          intensity={46}
+          pointerEvents="none"
+          style={styles.backdropBlur}
+          tint={scheme}
+        />
         <Pressable
           accessibilityLabel="Закрыть подтверждение"
           style={[
@@ -125,6 +205,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: spacing.four,
+  },
+  backdropBlur: {
+    ...StyleSheet.absoluteFillObject,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
