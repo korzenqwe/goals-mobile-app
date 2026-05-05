@@ -1,7 +1,11 @@
+import { fileURLToPath } from 'node:url'
+
 import antfu from '@antfu/eslint-config'
 import expo from 'eslint-plugin-expo'
 import reactHooks from 'eslint-plugin-react-hooks'
 
+const configDirectory = fileURLToPath(new URL('.', import.meta.url))
+const tsconfigPath = fileURLToPath(new URL('./tsconfig.json', import.meta.url))
 const sourceFiles = ['**/*.{js,jsx,ts,tsx}']
 const platformExtensions = [
   '.android.js',
@@ -44,7 +48,10 @@ export default antfu(
       semi: false,
     },
     typescript: {
-      tsconfigPath: './tsconfig.json',
+      parserOptions: {
+        tsconfigRootDir: configDirectory,
+      },
+      tsconfigPath,
     },
     yaml: true,
     rules: {
@@ -94,7 +101,7 @@ export default antfu(
           extensions: platformExtensions,
         },
         typescript: {
-          project: './tsconfig.json',
+          project: tsconfigPath,
         },
       },
     },
