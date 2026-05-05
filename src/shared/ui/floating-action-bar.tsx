@@ -18,7 +18,7 @@ export function FloatingActionBar({
 }: PropsWithChildren) {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
-      <GlassPanel style={styles.bar}>{children}</GlassPanel>
+      <GlassPanel style={styles.bar} variant="chrome">{children}</GlassPanel>
     </View>
   )
 }
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     gap: spacing.two,
-    padding: spacing.two,
+    paddingHorizontal: spacing.two,
+    paddingVertical: spacing.two,
   },
 })

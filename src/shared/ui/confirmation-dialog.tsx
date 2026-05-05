@@ -3,14 +3,20 @@ import {
   X,
 } from 'lucide-react-native'
 import {
+  BlurView,
+} from 'expo-blur'
+import {
   Modal,
   Pressable,
   StyleSheet,
   Text,
+  useColorScheme,
   View,
 } from 'react-native'
 
 import {
+  colors,
+  resolveColorScheme,
   spacing,
   typography,
   useAppTheme,
@@ -44,6 +50,8 @@ export function ConfirmationDialog({
   visible,
 }: ConfirmationDialogProps) {
   const theme = useAppTheme()
+  const scheme = resolveColorScheme(useColorScheme())
+  const palette = colors[scheme]
   let confirmButtonLabel = confirmLabel
 
   if (isConfirming) {
@@ -65,15 +73,34 @@ export function ConfirmationDialog({
       statusBarTranslucent
     >
       <View accessibilityViewIsModal style={styles.overlay}>
+        <BlurView
+          intensity={42}
+          pointerEvents="none"
+          style={styles.backdropBlur}
+          tint={scheme}
+        />
         <Pressable
           accessibilityLabel="Закрыть подтверждение"
-          style={styles.backdrop}
+          style={[
+            styles.backdrop,
+            {
+              backgroundColor: palette.backdrop,
+            },
+          ]}
           onPress={handleCancel}
         />
-        <GlassPanel style={styles.dialog}>
+        <GlassPanel style={styles.dialog} variant="modal">
           <View style={styles.header}>
-            <View style={[styles.iconFrame, { backgroundColor: theme.danger }]}>
-              <AlertTriangle color="#FFFFFF" size={20} strokeWidth={2.4} />
+            <View
+              style={[
+                styles.iconFrame,
+                {
+                  backgroundColor: theme.dangerSoft,
+                  borderColor: theme.danger,
+                },
+              ]}
+            >
+              <AlertTriangle color={theme.danger} size={20} strokeWidth={2.4} />
             </View>
             <View style={styles.copy}>
               <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
@@ -108,22 +135,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.four,
   },
+  backdropBlur: {
+    ...StyleSheet.absoluteFillObject,
+  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.36)',
   },
   dialog: {
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
     gap: spacing.four,
+    padding: spacing.five,
   },
   header: {
     flexDirection: 'row',
     gap: spacing.three,
+    alignItems: 'flex-start',
   },
   iconFrame: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 20,
   },
   copy: {
