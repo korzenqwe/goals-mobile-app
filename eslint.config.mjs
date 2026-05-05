@@ -62,29 +62,6 @@ const arrayPatternNewlineRule = {
     }
   },
 }
-const platformExtensions = [
-  '.android.js',
-  '.android.jsx',
-  '.android.ts',
-  '.android.tsx',
-  '.ios.js',
-  '.ios.jsx',
-  '.ios.ts',
-  '.ios.tsx',
-  '.native.js',
-  '.native.jsx',
-  '.native.ts',
-  '.native.tsx',
-  '.web.js',
-  '.web.jsx',
-  '.web.ts',
-  '.web.tsx',
-  '.js',
-  '.jsx',
-  '.ts',
-  '.tsx',
-  '.json',
-]
 
 export default antfu(
   {
@@ -178,12 +155,7 @@ export default antfu(
       'react-hooks': reactHooks,
     },
     settings: {
-      'import/extensions': platformExtensions,
-      'import/ignore': ['node_modules[\\\\/]+@?react-native'],
       'import/resolver': {
-        node: {
-          extensions: platformExtensions,
-        },
         typescript: {
           project: tsconfigPath,
         },
