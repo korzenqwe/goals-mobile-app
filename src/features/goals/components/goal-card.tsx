@@ -97,8 +97,8 @@ export function GoalCard({
             style={[
               styles.statPill,
               {
-                backgroundColor: theme.accentSoft,
-                borderColor: theme.border,
+                backgroundColor: theme.glassChrome,
+                borderColor: theme.glassBorder,
               },
             ]}
           >

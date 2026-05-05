@@ -62,8 +62,8 @@ function StatTile({
       style={[
         styles.tile,
         {
-          backgroundColor: theme.surfaceElevated,
-          borderColor: theme.border,
+          backgroundColor: theme.glassChrome,
+          borderColor: theme.glassBorder,
         },
       ]}
     >

@@ -78,8 +78,8 @@ export function GoalForm({
           style={[
             styles.input,
             {
-              backgroundColor: theme.surface,
-              borderColor: theme.border,
+              backgroundColor: theme.glassChrome,
+              borderColor: theme.glassBorder,
               color: theme.text,
             },
           ]}
@@ -99,8 +99,8 @@ export function GoalForm({
             styles.input,
             styles.textArea,
             {
-              backgroundColor: theme.surface,
-              borderColor: theme.border,
+              backgroundColor: theme.glassChrome,
+              borderColor: theme.glassBorder,
               color: theme.text,
             },
           ]}

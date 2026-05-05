@@ -43,14 +43,14 @@ export function IconButton({
   const isGhost = variant === 'ghost'
   const isDanger = variant === 'danger'
   const isSoft = variant === 'soft'
-  let tintColor: string = '#FFFFFF'
+  let tintColor: string = palette.accent
 
   if (isGhost) {
     tintColor = palette.textSecondary
   }
 
-  if (isSoft) {
-    tintColor = palette.accent
+  if (isDanger) {
+    tintColor = palette.danger
   }
 
   return (
@@ -99,17 +99,18 @@ function getButtonStateStyle({
   palette,
   pressed,
 }: ButtonStateStyleInput) {
-  let backgroundColor: string = palette.accent
-  let borderColor: string = 'transparent'
+  let backgroundColor: string = palette.accentGlass
+  let borderColor: string = palette.glassBorder
   let opacity = 1
 
   if (isDanger) {
-    backgroundColor = palette.danger
+    backgroundColor = palette.dangerSoft
+    borderColor = palette.danger
   }
 
   if (isSoft) {
-    backgroundColor = palette.accentSoft
-    borderColor = palette.border
+    backgroundColor = palette.glassChrome
+    borderColor = palette.glassBorder
   }
 
   if (isGhost) {
@@ -146,6 +147,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.full,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 6,
     paddingHorizontal: spacing.three,
   },
   content: {

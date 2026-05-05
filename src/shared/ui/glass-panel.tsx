@@ -1,6 +1,11 @@
 import {
   BlurView,
 } from 'expo-blur'
+import {
+  type GlassStyle,
+  GlassView,
+  isGlassEffectAPIAvailable,
+} from 'expo-glass-effect'
 import type {
   PropsWithChildren,
 } from 'react'
@@ -21,126 +26,155 @@ import {
 } from '@/shared/theme'
 
 type GlassPanelProps = PropsWithChildren<{
+  shape?: 'capsule' | 'rounded'
   style?: StyleProp<ViewStyle>
   variant?: 'chrome' | 'default' | 'modal'
 }>
 
+type GlassPanelState = {
+  backgroundColor: string
+  borderColor: string
+  glassEffectStyle: GlassStyle
+  intensity: number
+  isInteractive: boolean
+  shadowOpacity: number
+  shadowRadius: number
+}
+
 export function GlassPanel({
   children,
+  shape = 'rounded',
   style,
   variant = 'default',
 }: GlassPanelProps) {
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
-  let intensity = 46
-  let backgroundColor: string = palette.glass
-  let shadowOpacity = 0.16
-  let shadowRadius = 22
+  const panelState = getGlassPanelState(variant, palette)
+  let borderRadius: number = radii.large
 
-  if (variant === 'chrome') {
-    intensity = 68
-    backgroundColor = palette.glassChrome
-    shadowOpacity = 0.20
-    shadowRadius = 26
+  if (shape === 'capsule') {
+    borderRadius = radii.full
   }
 
-  if (variant === 'modal') {
-    intensity = 82
-    backgroundColor = palette.glassStrong
-    shadowOpacity = 0.26
-    shadowRadius = 34
-  }
-
-  if (Platform.OS === 'web') {
-    intensity += 10
-  }
-
-  if (Platform.OS === 'android') {
-    backgroundColor = palette.surfaceElevated
-    intensity = 0
-  }
-
-  return (
-    <BlurView
-      intensity={intensity}
-      tint={scheme}
-      style={[
-        styles.panel,
-        {
-          backgroundColor,
-          borderColor: palette.glassBorder,
-          shadowColor: palette.glassShadow,
-          shadowOpacity,
-          shadowRadius,
-        },
-        style,
-      ]}
-    >
+  const panelStyle = [
+    styles.panel,
+    {
+      backgroundColor: panelState.backgroundColor,
+      borderRadius,
+      borderColor: panelState.borderColor,
+      shadowColor: palette.glassShadow,
+      shadowOpacity: panelState.shadowOpacity,
+      shadowRadius: panelState.shadowRadius,
+    },
+    style,
+  ]
+  const content = (
+    <>
       <View
         pointerEvents="none"
         style={[
-          styles.edge,
+          styles.rim,
           {
+            borderRadius,
             borderColor: palette.glassEdge,
           },
         ]}
       />
-      <View
-        pointerEvents="none"
-        style={[
-          styles.highlight,
-          {
-            backgroundColor: palette.glassHighlight,
-          },
-        ]}
-      />
-      <View
-        pointerEvents="none"
-        style={[
-          styles.shade,
-          {
-            backgroundColor: palette.glassShade,
-          },
-        ]}
-      />
       {children}
+    </>
+  )
+
+  if (canUseNativeGlass()) {
+    return (
+      <GlassView
+        colorScheme={scheme}
+        glassEffectStyle={panelState.glassEffectStyle}
+        isInteractive={panelState.isInteractive}
+        style={panelStyle}
+        tintColor={palette.glassTint}
+      >
+        {content}
+      </GlassView>
+    )
+  }
+
+  return (
+    <BlurView
+      intensity={panelState.intensity}
+      tint={scheme}
+      style={panelStyle}
+    >
+      {content}
     </BlurView>
   )
+}
+
+function getGlassPanelState(
+  variant: NonNullable<GlassPanelProps['variant']>,
+  palette: typeof colors.light | typeof colors.dark,
+): GlassPanelState {
+  const state: GlassPanelState = {
+    backgroundColor: palette.glass,
+    borderColor: palette.glassBorder,
+    glassEffectStyle: 'regular',
+    intensity: 34,
+    isInteractive: false,
+    shadowOpacity: 0.10,
+    shadowRadius: 18,
+  }
+
+  if (variant === 'chrome') {
+    state.backgroundColor = palette.glassChrome
+    state.glassEffectStyle = 'clear'
+    state.intensity = 52
+    state.isInteractive = true
+    state.shadowOpacity = 0.16
+    state.shadowRadius = 24
+  }
+
+  if (variant === 'modal') {
+    state.backgroundColor = palette.glassStrong
+    state.glassEffectStyle = 'regular'
+    state.intensity = 64
+    state.isInteractive = true
+    state.shadowOpacity = 0.20
+    state.shadowRadius = 32
+  }
+
+  if (Platform.OS === 'android') {
+    state.backgroundColor = palette.surfaceElevated
+    state.intensity = 0
+  }
+
+  return state
+}
+
+function canUseNativeGlass() {
+  if (Platform.OS !== 'ios') {
+    return false
+  }
+
+  try {
+    return isGlassEffectAPIAvailable()
+  } catch {
+    return false
+  }
 }
 
 const styles = StyleSheet.create({
   panel: {
     overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radii.large,
     padding: spacing.four,
     shadowOffset: {
       width: 0,
-      height: 18,
+      height: 12,
     },
-    elevation: 14,
+    elevation: 8,
   },
-  edge: {
+  rim: {
     ...StyleSheet.absoluteFillObject,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radii.large,
-  },
-  highlight: {
-    position: 'absolute',
-    top: 1,
-    right: 1,
-    left: 1,
-    height: 32,
-    borderTopLeftRadius: radii.large,
-    borderTopRightRadius: radii.large,
-  },
-  shade: {
-    position: 'absolute',
-    right: 1,
-    bottom: 1,
-    left: 1,
-    height: 40,
-    borderBottomLeftRadius: radii.large,
-    borderBottomRightRadius: radii.large,
+    opacity: 0.82,
   },
 })

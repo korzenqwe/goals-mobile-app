@@ -29,22 +29,12 @@ export function AppScreen({
   scroll = false,
 }: AppScreenProps) {
   const scheme = resolveColorScheme(useColorScheme())
-  const palette = colors[scheme]
-  const backgroundColor = palette.background
+  const backgroundColor = colors[scheme].background
 
   if (scroll) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
         <View style={styles.container}>
-          <View
-            pointerEvents="none"
-            style={[
-              styles.backgroundWash,
-              {
-                backgroundColor: palette.backgroundWash,
-              },
-            ]}
-          />
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {children}
           </ScrollView>
@@ -57,15 +47,6 @@ export function AppScreen({
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <View style={styles.container}>
-        <View
-          pointerEvents="none"
-          style={[
-            styles.backgroundWash,
-            {
-              backgroundColor: palette.backgroundWash,
-            },
-          ]}
-        />
         <View style={styles.content}>{children}</View>
         {footer}
       </View>
@@ -79,13 +60,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-  },
-  backgroundWash: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    left: 0,
-    height: 188,
   },
   scroll: {
     flex: 1,

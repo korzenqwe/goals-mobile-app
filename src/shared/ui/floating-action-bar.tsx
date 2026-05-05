@@ -18,7 +18,7 @@ export function FloatingActionBar({
 }: PropsWithChildren) {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
-      <GlassPanel style={styles.bar} variant="chrome">{children}</GlassPanel>
+      <GlassPanel shape="capsule" style={styles.bar} variant="chrome">{children}</GlassPanel>
     </View>
   )
 }
