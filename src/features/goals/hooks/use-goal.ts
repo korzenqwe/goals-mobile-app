@@ -3,6 +3,7 @@ import {
 } from '@react-navigation/native'
 import {
   useCallback,
+  useRef,
   useState,
 } from 'react'
 
@@ -18,6 +19,8 @@ import {
 } from '@/shared/db'
 
 export function useGoal(goalId: string) {
+  const isFocusedRef = useRef(false)
+  const requestIdRef = useRef(0)
   const [
     goal,
     setGoal,
@@ -40,26 +43,41 @@ export function useGoal(goalId: string) {
   ] = useState(true)
 
   const refresh = useCallback(async () => {
+    const requestId = requestIdRef.current + 1
+    requestIdRef.current = requestId
+
+    function canApplyState() {
+      return isFocusedRef.current && requestIdRef.current === requestId
+    }
+
     if (!goalId) {
-      setGoal(null)
-      setStats(null)
-      setIsCompletedToday(false)
-      setError(null)
-      setIsLoading(false)
+      if (canApplyState()) {
+        setGoal(null)
+        setStats(null)
+        setIsCompletedToday(false)
+        setError(null)
+        setIsLoading(false)
+      }
+
       return
     }
 
-    setIsLoading(true)
+    if (canApplyState()) {
+      setIsLoading(true)
+    }
 
     try {
       const nextGoal = await goalsRepository.getGoal(goalId)
       const today = getLocalDateString()
 
       if (!nextGoal) {
-        setGoal(null)
-        setStats(null)
-        setIsCompletedToday(false)
-        setError('Цель не найдена.')
+        if (canApplyState()) {
+          setGoal(null)
+          setStats(null)
+          setIsCompletedToday(false)
+          setError('Цель не найдена.')
+        }
+
         return
       }
 
@@ -71,10 +89,12 @@ export function useGoal(goalId: string) {
         goalsRepository.isCompletedOn(goalId, today),
       ])
 
-      setGoal(nextGoal)
-      setStats(nextStats)
-      setIsCompletedToday(nextIsCompletedToday)
-      setError(null)
+      if (canApplyState()) {
+        setGoal(nextGoal)
+        setStats(nextStats)
+        setIsCompletedToday(nextIsCompletedToday)
+        setError(null)
+      }
     } catch (caughtError) {
       let message = 'Не удалось загрузить цель.'
 
@@ -82,15 +102,25 @@ export function useGoal(goalId: string) {
         message = caughtError.message
       }
 
-      setError(message)
+      if (canApplyState()) {
+        setError(message)
+      }
     } finally {
-      setIsLoading(false)
+      if (canApplyState()) {
+        setIsLoading(false)
+      }
     }
   }, [goalId])
 
   useFocusEffect(
     useCallback(() => {
+      isFocusedRef.current = true
       void refresh()
+
+      return () => {
+        isFocusedRef.current = false
+        requestIdRef.current += 1
+      }
     }, [refresh]),
   )
 

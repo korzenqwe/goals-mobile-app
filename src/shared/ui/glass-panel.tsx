@@ -42,6 +42,13 @@ type GlassPanelState = {
   shadowRadius: number
 }
 
+type WebBackdropStyle = ViewStyle & {
+  WebkitBackdropFilter?: string
+  backdropFilter?: string
+}
+
+let nativeGlassAvailability: boolean | null = null
+
 export function GlassPanel({
   children,
   shape = 'rounded',
@@ -175,10 +182,12 @@ function getWebBackdropStyle(backdropFilter: string) {
     return null
   }
 
-  return {
+  const style: WebBackdropStyle = {
     backdropFilter,
     WebkitBackdropFilter: backdropFilter,
-  } as ViewStyle
+  }
+
+  return style
 }
 
 function canUseNativeGlass() {
@@ -186,9 +195,15 @@ function canUseNativeGlass() {
     return false
   }
 
+  if (nativeGlassAvailability !== null) {
+    return nativeGlassAvailability
+  }
+
   try {
-    return isGlassEffectAPIAvailable()
+    nativeGlassAvailability = isGlassEffectAPIAvailable()
+    return nativeGlassAvailability
   } catch {
+    nativeGlassAvailability = false
     return false
   }
 }

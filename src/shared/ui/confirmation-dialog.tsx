@@ -130,6 +130,16 @@ type BackdropBlurProps = {
   tint: 'dark' | 'light'
 }
 
+type WebBackdropStyle = ViewStyle & {
+  WebkitBackdropFilter?: string
+  backdropFilter?: string
+}
+
+const webBackdropBlurStyle: WebBackdropStyle = {
+  backdropFilter: 'blur(22px) saturate(170%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+}
+
 function BackdropBlur({
   tint,
 }: BackdropBlurProps) {
@@ -139,7 +149,7 @@ function BackdropBlur({
         pointerEvents="none"
         style={[
           styles.backdropBlur,
-          styles.webBackdropBlur,
+          webBackdropBlurStyle,
         ]}
       />
     )
@@ -164,10 +174,6 @@ const styles = StyleSheet.create({
   backdropBlur: {
     ...StyleSheet.absoluteFillObject,
   },
-  webBackdropBlur: {
-    backdropFilter: 'blur(22px) saturate(170%)',
-    WebkitBackdropFilter: 'blur(22px) saturate(170%)',
-  } as ViewStyle,
   backdrop: {
     ...StyleSheet.absoluteFillObject,
   },

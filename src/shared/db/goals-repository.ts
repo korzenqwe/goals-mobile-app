@@ -261,42 +261,48 @@ class SQLiteGoalsRepository implements GoalsRepository {
 
   async toggleCompletion(input: ToggleCompletionInput) {
     const database = await getDatabaseAsync()
-    const existing = await database.getFirstAsync<CompletionRow>(
-      `
-      SELECT * FROM goal_completions
-      WHERE goal_id = ? AND date = ?;
-    `,
-      input.goalId,
-      input.date,
-    )
+    let toggledCompletion: GoalCompletion | null = null
 
-    if (existing) {
-      await database.runAsync('DELETE FROM goal_completions WHERE id = ?;', existing.id)
-      return null
-    }
+    await database.withExclusiveTransactionAsync(async (transaction) => {
+      const deleteResult = await transaction.runAsync(
+        `
+        DELETE FROM goal_completions
+        WHERE goal_id = ? AND date = ?;
+      `,
+        input.goalId,
+        input.date,
+      )
 
-    const now = new Date().toISOString()
-    const completion: GoalCompletion = {
-      id: createId('completion'),
-      goalId: input.goalId,
-      date: input.date,
-      note: normalizeNullableText(input.note),
-      createdAt: now,
-    }
+      if (deleteResult.changes > 0) {
+        toggledCompletion = null
+        return
+      }
 
-    await database.runAsync(
-      `
-      INSERT INTO goal_completions (id, goal_id, date, note, created_at)
-      VALUES (?, ?, ?, ?, ?);
-    `,
-      completion.id,
-      completion.goalId,
-      completion.date,
-      completion.note,
-      completion.createdAt,
-    )
+      const now = new Date().toISOString()
+      const completion: GoalCompletion = {
+        id: createId('completion'),
+        goalId: input.goalId,
+        date: input.date,
+        note: normalizeNullableText(input.note),
+        createdAt: now,
+      }
 
-    return completion
+      await transaction.runAsync(
+        `
+        INSERT INTO goal_completions (id, goal_id, date, note, created_at)
+        VALUES (?, ?, ?, ?, ?);
+      `,
+        completion.id,
+        completion.goalId,
+        completion.date,
+        completion.note,
+        completion.createdAt,
+      )
+
+      toggledCompletion = completion
+    })
+
+    return toggledCompletion
   }
 
   async updateCompletionNote(goalId: string, date: LocalDateString, note: string | null) {

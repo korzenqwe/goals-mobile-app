@@ -3,6 +3,7 @@ import {
 } from '@react-navigation/native'
 import {
   useCallback,
+  useRef,
   useState,
 } from 'react'
 
@@ -17,6 +18,8 @@ import {
 } from '@/shared/db'
 
 export function useGoalsList() {
+  const isFocusedRef = useRef(false)
+  const requestIdRef = useRef(0)
   const [
     goals,
     setGoals,
@@ -33,6 +36,10 @@ export function useGoalsList() {
   const refreshGoal = useCallback(async (goalId: string) => {
     const goal = await goalsRepository.getGoal(goalId)
 
+    if (!isFocusedRef.current) {
+      return
+    }
+
     if (!goal) {
       setGoals((currentGoals) => currentGoals.filter((item) => item.goal.id !== goalId))
       return
@@ -40,26 +47,39 @@ export function useGoalsList() {
 
     const nextGoalItem = await buildGoalViewModel(goal)
 
-    setGoals((currentGoals) =>
-      currentGoals.map((item) => {
-        if (item.goal.id === goalId) {
-          return nextGoalItem
-        }
+    if (isFocusedRef.current) {
+      setGoals((currentGoals) =>
+        currentGoals.map((item) => {
+          if (item.goal.id === goalId) {
+            return nextGoalItem
+          }
 
-        return item
-      }),
-    )
+          return item
+        }),
+      )
+    }
   }, [])
 
   const refresh = useCallback(async () => {
-    setIsLoading(true)
+    const requestId = requestIdRef.current + 1
+    requestIdRef.current = requestId
+
+    function canApplyState() {
+      return isFocusedRef.current && requestIdRef.current === requestId
+    }
+
+    if (canApplyState()) {
+      setIsLoading(true)
+    }
 
     try {
       const nextGoals = await goalsRepository.listGoals({ status: 'active' })
       const nextGoalItems = await Promise.all(nextGoals.map(buildGoalViewModel))
 
-      setGoals(nextGoalItems)
-      setError(null)
+      if (canApplyState()) {
+        setGoals(nextGoalItems)
+        setError(null)
+      }
     } catch (caughtError) {
       let message = 'Не удалось загрузить цели.'
 
@@ -67,15 +87,25 @@ export function useGoalsList() {
         message = caughtError.message
       }
 
-      setError(message)
+      if (canApplyState()) {
+        setError(message)
+      }
     } finally {
-      setIsLoading(false)
+      if (canApplyState()) {
+        setIsLoading(false)
+      }
     }
   }, [])
 
   useFocusEffect(
     useCallback(() => {
+      isFocusedRef.current = true
       void refresh()
+
+      return () => {
+        isFocusedRef.current = false
+        requestIdRef.current += 1
+      }
     }, [refresh]),
   )
 
