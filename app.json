@@ -8,7 +8,8 @@
     "scheme": "goals",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.kitaharaio.goals"
     },
     "android": {
       "adaptiveIcon": {
