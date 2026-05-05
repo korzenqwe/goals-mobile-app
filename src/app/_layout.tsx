@@ -1,4 +1,8 @@
 import {
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler'
+
+import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
@@ -10,6 +14,7 @@ import {
   StatusBar,
 } from 'expo-status-bar'
 import {
+  StyleSheet,
   useColorScheme,
 } from 'react-native'
 
@@ -22,14 +27,30 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={navigationTheme}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' },
-        }}
-      />
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <ThemeProvider value={navigationTheme}>
+        <Stack
+          screenOptions={{
+            animation: 'slide_from_right',
+            animationMatchesGesture: true,
+            contentStyle: styles.stackContent,
+            fullScreenGestureEnabled: true,
+            gestureDirection: 'horizontal',
+            gestureEnabled: true,
+            headerShown: false,
+          }}
+        />
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  stackContent: {
+    backgroundColor: 'transparent',
+  },
+})

@@ -6,6 +6,9 @@ import {
   BlurView,
 } from 'expo-blur'
 import {
+  useEffect,
+} from 'react'
+import {
   Modal,
   Platform,
   Pressable,
@@ -15,6 +18,17 @@ import {
   View,
   type ViewStyle,
 } from 'react-native'
+import {
+  Gesture,
+  GestureDetector,
+} from 'react-native-gesture-handler'
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context'
@@ -68,6 +82,59 @@ export function ConfirmationDialog({
   if (isConfirming) {
     confirmButtonLabel = 'Удаляем...'
   }
+
+  const sheetTranslateY = useSharedValue(0)
+  const animatedSheetStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateY: sheetTranslateY.value,
+      },
+    ],
+  }))
+  const sheetGesture = Gesture.Pan()
+    .enabled(!isConfirming)
+    .onUpdate((event) => {
+      if (event.translationY > 0) {
+        sheetTranslateY.value = event.translationY
+      }
+    })
+    .onEnd((event) => {
+      let shouldDismiss = false
+
+      if (event.translationY > sheetDismissThreshold) {
+        shouldDismiss = true
+      }
+
+      if (event.velocityY > sheetDismissVelocity) {
+        shouldDismiss = true
+      }
+
+      if (shouldDismiss) {
+        sheetTranslateY.value = withTiming(sheetDismissDistance, {
+          duration: 180,
+        }, (finished) => {
+          if (finished) {
+            runOnJS(handleCancel)()
+          }
+        })
+
+        return
+      }
+
+      sheetTranslateY.value = withSpring(0, {
+        damping: 24,
+        stiffness: 260,
+      })
+    })
+
+  useEffect(() => {
+    if (visible) {
+      sheetTranslateY.value = 0
+    }
+  }, [
+    sheetTranslateY,
+    visible,
+  ])
 
   function handleCancel() {
     if (!isConfirming) {
@@ -133,6 +200,13 @@ export function ConfirmationDialog({
         />
       </View>
     </GlassPanel>
+  )
+  const nativeDialog = (
+    <GestureDetector gesture={sheetGesture}>
+      <Animated.View style={animatedSheetStyle}>
+        {dialog}
+      </Animated.View>
+    </GestureDetector>
   )
 
   if (Platform.OS === 'web') {
@@ -203,7 +277,7 @@ export function ConfirmationDialog({
           ]}
           onPress={handleCancel}
         />
-        {dialog}
+        {nativeDialog}
       </View>
     </Modal>
   )
@@ -235,6 +309,10 @@ const webOverlayStyle: WebOverlayStyle = {
   left: 0,
   zIndex: 1000,
 }
+
+const sheetDismissDistance = 360
+const sheetDismissThreshold = 96
+const sheetDismissVelocity = 900
 
 function BackdropBlur({
   tint,
