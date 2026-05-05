@@ -179,7 +179,7 @@ export function ToastProvider({
         style={[
           styles.viewport,
           {
-            top: insets.top + toastHeaderOffset,
+            top: insets.top + spacing.three,
           },
         ]}
       >
@@ -220,7 +220,6 @@ export function useToast() {
   return context
 }
 
-const toastHeaderOffset = spacing.seven + spacing.six + spacing.two
 const toastVisibilityDuration = 2600
 
 const styles = StyleSheet.create({

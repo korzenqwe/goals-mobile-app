@@ -103,7 +103,12 @@ export function GlassPanel({
       <BlurView
         intensity={panelState.intensity}
         pointerEvents="none"
-        style={styles.blur}
+        style={[
+          styles.blur,
+          {
+            borderRadius,
+          },
+        ]}
         tint={panelState.blurTint}
       />
       {decoratedContent}
@@ -145,7 +150,7 @@ function getGlassPanelState(
   if (variant === 'toast') {
     state.backgroundColor = palette.glassFloating
     state.blurTint = resolveBlurTint(scheme, 'toast')
-    state.intensity = 72
+    state.intensity = 90
     state.shadowOpacity = 0.24
     state.shadowRadius = 26
   }
@@ -170,7 +175,7 @@ function resolveBlurTint(
 ): BlurTint {
   if (scheme === 'dark') {
     if (variant === 'toast') {
-      return 'systemUltraThinMaterialDark'
+      return 'default'
     }
 
     if (variant === 'chrome') {
@@ -181,7 +186,7 @@ function resolveBlurTint(
   }
 
   if (variant === 'toast') {
-    return 'systemUltraThinMaterialLight'
+    return 'default'
   }
 
   if (variant === 'chrome') {
@@ -205,6 +210,7 @@ const styles = StyleSheet.create({
   },
   blur: {
     ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
   },
   tint: {
     ...StyleSheet.absoluteFillObject,

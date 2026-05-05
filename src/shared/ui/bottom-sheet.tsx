@@ -142,8 +142,10 @@ export function BottomSheet({
   if (Platform.OS === 'web') {
     let pointerEvents: 'auto' | 'none' = 'none'
     let opacity = 0
+    let display: 'flex' | 'none' = 'none'
 
     if (visible) {
+      display = 'flex'
       pointerEvents = 'auto'
       opacity = 1
     }
@@ -156,6 +158,7 @@ export function BottomSheet({
           styles.overlay,
           webOverlayStyle,
           {
+            display,
             opacity,
             paddingBottom: bottomInset,
           },
