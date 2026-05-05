@@ -1,11 +1,7 @@
 import {
+  type BlurTint,
   BlurView,
 } from 'expo-blur'
-import {
-  type GlassStyle,
-  GlassView,
-  isGlassEffectAPIAvailable,
-} from 'expo-glass-effect'
 import type {
   PropsWithChildren,
 } from 'react'
@@ -28,26 +24,18 @@ import {
 type GlassPanelProps = PropsWithChildren<{
   shape?: 'capsule' | 'rounded'
   style?: StyleProp<ViewStyle>
-  variant?: 'chrome' | 'default' | 'modal'
+  variant?: 'chrome' | 'default' | 'modal' | 'toast'
 }>
 
 type GlassPanelState = {
   backgroundColor: string
-  backdropFilter: string
   borderColor: string
-  glassEffectStyle: GlassStyle
+  blurTint: BlurTint
+  contentBackgroundColor: string
   intensity: number
-  isInteractive: boolean
   shadowOpacity: number
   shadowRadius: number
 }
-
-type WebBackdropStyle = ViewStyle & {
-  WebkitBackdropFilter?: string
-  backdropFilter?: string
-}
-
-let nativeGlassAvailability: boolean | null = null
 
 export function GlassPanel({
   children,
@@ -57,7 +45,7 @@ export function GlassPanel({
 }: GlassPanelProps) {
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
-  const panelState = getGlassPanelState(variant, palette)
+  const panelState = getGlassPanelState(variant, palette, scheme)
   let borderRadius: number = radii.large
 
   if (shape === 'capsule') {
@@ -66,9 +54,8 @@ export function GlassPanel({
 
   const panelStyle = [
     styles.panel,
-    getWebBackdropStyle(panelState.backdropFilter),
     {
-      backgroundColor: panelState.backgroundColor,
+      backgroundColor: panelState.contentBackgroundColor,
       borderRadius,
       borderColor: panelState.borderColor,
       shadowColor: palette.glassShadow,
@@ -77,8 +64,18 @@ export function GlassPanel({
     },
     style,
   ]
-  const content = (
+  const decoratedContent = (
     <>
+      <View
+        pointerEvents="none"
+        style={[
+          styles.tint,
+          {
+            backgroundColor: panelState.backgroundColor,
+            borderRadius,
+          },
+        ]}
+      />
       <View
         pointerEvents="none"
         style={[
@@ -93,124 +90,111 @@ export function GlassPanel({
     </>
   )
 
-  if (canUseNativeGlass()) {
-    return (
-      <GlassView
-        colorScheme={scheme}
-        glassEffectStyle={panelState.glassEffectStyle}
-        isInteractive={panelState.isInteractive}
-        style={panelStyle}
-        tintColor={palette.glassTint}
-      >
-        {content}
-      </GlassView>
-    )
-  }
-
-  if (Platform.OS === 'web') {
-    return (
-      <View style={panelStyle}>
-        {content}
-      </View>
-    )
-  }
-
   if (Platform.OS === 'android') {
     return (
       <View style={panelStyle}>
-        {content}
+        {decoratedContent}
       </View>
     )
   }
 
   return (
-    <BlurView
-      intensity={panelState.intensity}
-      tint={scheme}
-      style={panelStyle}
-    >
-      {content}
-    </BlurView>
+    <View style={panelStyle}>
+      <BlurView
+        intensity={panelState.intensity}
+        pointerEvents="none"
+        style={styles.blur}
+        tint={panelState.blurTint}
+      />
+      {decoratedContent}
+    </View>
   )
 }
 
 function getGlassPanelState(
   variant: NonNullable<GlassPanelProps['variant']>,
   palette: typeof colors.light | typeof colors.dark,
+  scheme: 'dark' | 'light',
 ): GlassPanelState {
   const state: GlassPanelState = {
     backgroundColor: palette.glass,
-    backdropFilter: 'blur(18px) saturate(170%)',
     borderColor: palette.glassBorder,
-    glassEffectStyle: 'regular',
+    blurTint: resolveBlurTint(scheme, 'default'),
+    contentBackgroundColor: 'transparent',
     intensity: 34,
-    isInteractive: false,
     shadowOpacity: 0.10,
     shadowRadius: 18,
   }
 
   if (variant === 'chrome') {
     state.backgroundColor = palette.glassChrome
-    state.backdropFilter = 'blur(24px) saturate(190%)'
-    state.glassEffectStyle = 'clear'
-    state.intensity = 52
-    state.isInteractive = true
+    state.blurTint = resolveBlurTint(scheme, 'chrome')
+    state.intensity = 46
     state.shadowOpacity = 0.16
     state.shadowRadius = 24
   }
 
   if (variant === 'modal') {
     state.backgroundColor = palette.glassStrong
-    state.backdropFilter = 'blur(18px) saturate(165%)'
-    state.glassEffectStyle = 'regular'
+    state.blurTint = resolveBlurTint(scheme, 'modal')
     state.intensity = 44
-    state.isInteractive = true
     state.shadowOpacity = 0.20
     state.shadowRadius = 32
   }
 
+  if (variant === 'toast') {
+    state.backgroundColor = palette.glassFloating
+    state.blurTint = resolveBlurTint(scheme, 'toast')
+    state.intensity = 72
+    state.shadowOpacity = 0.24
+    state.shadowRadius = 26
+  }
+
   if (Platform.OS === 'android') {
     state.backgroundColor = palette.surfaceElevated
+    state.contentBackgroundColor = palette.surfaceElevated
     state.intensity = 0
+
+    if (variant === 'toast') {
+      state.backgroundColor = palette.glassFloating
+      state.contentBackgroundColor = palette.glassFloating
+    }
   }
 
   return state
 }
 
-function getWebBackdropStyle(backdropFilter: string) {
-  if (Platform.OS !== 'web') {
-    return null
+function resolveBlurTint(
+  scheme: 'dark' | 'light',
+  variant: NonNullable<GlassPanelProps['variant']>,
+): BlurTint {
+  if (scheme === 'dark') {
+    if (variant === 'toast') {
+      return 'systemUltraThinMaterialDark'
+    }
+
+    if (variant === 'chrome') {
+      return 'systemThinMaterialDark'
+    }
+
+    return 'dark'
   }
 
-  const style: WebBackdropStyle = {
-    backdropFilter,
-    WebkitBackdropFilter: backdropFilter,
+  if (variant === 'toast') {
+    return 'systemUltraThinMaterialLight'
   }
 
-  return style
-}
-
-function canUseNativeGlass() {
-  if (Platform.OS !== 'ios') {
-    return false
+  if (variant === 'chrome') {
+    return 'systemThinMaterialLight'
   }
 
-  if (nativeGlassAvailability !== null) {
-    return nativeGlassAvailability
-  }
-
-  try {
-    nativeGlassAvailability = isGlassEffectAPIAvailable()
-    return nativeGlassAvailability
-  } catch {
-    nativeGlassAvailability = false
-    return false
-  }
+  return 'light'
 }
 
 const styles = StyleSheet.create({
   panel: {
     overflow: 'hidden',
+    position: 'relative',
     borderWidth: StyleSheet.hairlineWidth,
     padding: spacing.four,
     shadowOffset: {
@@ -218,6 +202,12 @@ const styles = StyleSheet.create({
       height: 12,
     },
     elevation: 8,
+  },
+  blur: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  tint: {
+    ...StyleSheet.absoluteFillObject,
   },
   rim: {
     ...StyleSheet.absoluteFillObject,

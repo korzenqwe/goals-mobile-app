@@ -36,11 +36,15 @@ import {
   GlassPanel,
   IconButton,
   PageHeader,
+  useToast,
 } from '@/shared/ui'
 
 export function EditGoalScreen() {
   const router = useRouter()
   const theme = useAppTheme()
+  const {
+    showToast,
+  } = useToast()
   const {
     id,
   } = useLocalSearchParams<{ id: string }>()
@@ -78,6 +82,7 @@ export function EditGoalScreen() {
     try {
       await goalsRepository.updateGoal(goalId, values)
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+      showToast({ message: 'Изменения сохранены' })
       router.replace({ pathname: '/goals/[id]', params: { id: goalId } })
     } catch (caughtError) {
       let message = 'Не удалось сохранить цель.'
@@ -100,6 +105,7 @@ export function EditGoalScreen() {
     try {
       await goalsRepository.deleteGoal(goalId)
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+      showToast({ message: 'Цель удалена' })
       router.replace('/')
     } catch (caughtError) {
       let message = 'Не удалось удалить цель.'

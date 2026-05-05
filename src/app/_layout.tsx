@@ -18,6 +18,10 @@ import {
   useColorScheme,
 } from 'react-native'
 
+import {
+  ToastProvider,
+} from '@/shared/ui/toast'
+
 export default function RootLayout() {
   const colorScheme = useColorScheme()
   let navigationTheme = DefaultTheme
@@ -29,18 +33,20 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider value={navigationTheme}>
-        <Stack
-          screenOptions={{
-            animation: 'slide_from_right',
-            animationMatchesGesture: true,
-            contentStyle: styles.stackContent,
-            fullScreenGestureEnabled: true,
-            gestureDirection: 'horizontal',
-            gestureEnabled: true,
-            headerShown: false,
-          }}
-        />
-        <StatusBar style="auto" />
+        <ToastProvider>
+          <Stack
+            screenOptions={{
+              animation: 'slide_from_right',
+              animationMatchesGesture: true,
+              contentStyle: styles.stackContent,
+              fullScreenGestureEnabled: true,
+              gestureDirection: 'horizontal',
+              gestureEnabled: true,
+              headerShown: false,
+            }}
+          />
+          <StatusBar style="auto" />
+        </ToastProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   )

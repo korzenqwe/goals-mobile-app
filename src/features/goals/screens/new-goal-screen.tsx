@@ -16,10 +16,14 @@ import {
 import {
   AppScreen,
   PageHeader,
+  useToast,
 } from '@/shared/ui'
 
 export function NewGoalScreen() {
   const router = useRouter()
+  const {
+    showToast,
+  } = useToast()
   const [
     error,
     setError,
@@ -36,6 +40,7 @@ export function NewGoalScreen() {
     try {
       await goalsRepository.createGoal(values)
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+      showToast({ message: 'Цель создана' })
       router.replace('/')
     } catch (caughtError) {
       let message = 'Не удалось создать цель.'

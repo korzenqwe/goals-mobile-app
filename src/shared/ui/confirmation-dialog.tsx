@@ -3,46 +3,19 @@ import {
   X,
 } from 'lucide-react-native'
 import {
-  BlurView,
-} from 'expo-blur'
-import {
-  useEffect,
-} from 'react'
-import {
-  Modal,
-  Platform,
-  Pressable,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
-  type ViewStyle,
 } from 'react-native'
-import {
-  Gesture,
-  GestureDetector,
-} from 'react-native-gesture-handler'
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated'
-import {
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context'
 
 import {
-  colors,
-  resolveColorScheme,
   spacing,
   typography,
   useAppTheme,
 } from '@/shared/theme'
 import {
-  GlassPanel,
-} from '@/shared/ui/glass-panel'
+  BottomSheet,
+} from '@/shared/ui/bottom-sheet'
 import {
   IconButton,
 } from '@/shared/ui/icon-button'
@@ -68,86 +41,19 @@ export function ConfirmationDialog({
   title,
   visible,
 }: ConfirmationDialogProps) {
-  const insets = useSafeAreaInsets()
   const theme = useAppTheme()
-  const scheme = resolveColorScheme(useColorScheme())
-  const palette = colors[scheme]
-  let bottomInset = spacing.four
   let confirmButtonLabel = confirmLabel
-
-  if (insets.bottom > 0) {
-    bottomInset = insets.bottom + spacing.two
-  }
 
   if (isConfirming) {
     confirmButtonLabel = 'Удаляем...'
   }
 
-  const sheetTranslateY = useSharedValue(0)
-  const animatedSheetStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: sheetTranslateY.value,
-      },
-    ],
-  }))
-  const sheetGesture = Gesture.Pan()
-    .enabled(!isConfirming)
-    .onUpdate((event) => {
-      if (event.translationY > 0) {
-        sheetTranslateY.value = event.translationY
-      }
-    })
-    .onEnd((event) => {
-      let shouldDismiss = false
-
-      if (event.translationY > sheetDismissThreshold) {
-        shouldDismiss = true
-      }
-
-      if (event.velocityY > sheetDismissVelocity) {
-        shouldDismiss = true
-      }
-
-      if (shouldDismiss) {
-        sheetTranslateY.value = withTiming(sheetDismissDistance, {
-          duration: 180,
-        }, (finished) => {
-          if (finished) {
-            runOnJS(handleCancel)()
-          }
-        })
-
-        return
-      }
-
-      sheetTranslateY.value = withSpring(0, {
-        damping: 24,
-        stiffness: 260,
-      })
-    })
-
-  useEffect(() => {
-    if (visible) {
-      sheetTranslateY.value = 0
-    }
-  }, [
-    sheetTranslateY,
-    visible,
-  ])
-
-  function handleCancel() {
-    if (!isConfirming) {
-      onCancel()
-    }
-  }
-
-  const dialog = (
-    <GlassPanel style={styles.dialog} variant="modal">
-      <View style={styles.handleTrack}>
-        <View style={[styles.handle, { backgroundColor: theme.glassEdge }]} />
-      </View>
-
+  return (
+    <BottomSheet
+      dismissDisabled={isConfirming}
+      onDismiss={onCancel}
+      visible={visible}
+    >
       <View style={styles.hero}>
         <View
           style={[
@@ -178,7 +84,9 @@ export function ConfirmationDialog({
 
       <View style={styles.notice}>
         <View style={[styles.noticeMark, { backgroundColor: theme.danger }]} />
-        <Text style={[styles.noticeText, { color: theme.textSecondary }]}>Действие нельзя отменить</Text>
+        <Text style={[styles.noticeText, { color: theme.textSecondary }]}>
+          Действие нельзя отменить
+        </Text>
       </View>
 
       <View style={styles.actions}>
@@ -186,7 +94,7 @@ export function ConfirmationDialog({
           disabled={isConfirming}
           icon={X}
           label={cancelLabel}
-          onPress={handleCancel}
+          onPress={onCancel}
           style={styles.actionButton}
           variant="soft"
         />
@@ -199,176 +107,11 @@ export function ConfirmationDialog({
           variant="danger"
         />
       </View>
-    </GlassPanel>
-  )
-  const nativeDialog = (
-    <GestureDetector gesture={sheetGesture}>
-      <Animated.View style={animatedSheetStyle}>
-        {dialog}
-      </Animated.View>
-    </GestureDetector>
-  )
-
-  if (Platform.OS === 'web') {
-    let pointerEvents: 'auto' | 'none' = 'none'
-    let opacity = 0
-
-    if (visible) {
-      pointerEvents = 'auto'
-      opacity = 1
-    }
-
-    return (
-      <View
-        accessibilityViewIsModal={visible}
-        pointerEvents={pointerEvents}
-        style={[
-          styles.overlay,
-          webOverlayStyle,
-          {
-            paddingBottom: bottomInset,
-          },
-          {
-            opacity,
-          },
-        ]}
-      >
-        <BackdropBlur tint={scheme} />
-        <Pressable
-          accessibilityLabel="Закрыть подтверждение"
-          style={[
-            styles.backdrop,
-            {
-              backgroundColor: palette.backdrop,
-            },
-          ]}
-          onPress={handleCancel}
-        />
-        {dialog}
-      </View>
-    )
-  }
-
-  return (
-    <Modal
-      animationType="slide"
-      onRequestClose={handleCancel}
-      transparent
-      visible={visible}
-      statusBarTranslucent
-    >
-      <View
-        accessibilityViewIsModal
-        style={[
-          styles.overlay,
-          {
-            paddingBottom: bottomInset,
-          },
-        ]}
-      >
-        <BackdropBlur tint={scheme} />
-        <Pressable
-          accessibilityLabel="Закрыть подтверждение"
-          style={[
-            styles.backdrop,
-            {
-              backgroundColor: palette.backdrop,
-            },
-          ]}
-          onPress={handleCancel}
-        />
-        {nativeDialog}
-      </View>
-    </Modal>
-  )
-}
-
-type BackdropBlurProps = {
-  tint: 'dark' | 'light'
-}
-
-type WebBackdropStyle = ViewStyle & {
-  WebkitBackdropFilter?: string
-  backdropFilter?: string
-}
-
-type WebOverlayStyle = ViewStyle & {
-  position: 'fixed'
-}
-
-const webBackdropBlurStyle: WebBackdropStyle = {
-  backdropFilter: 'blur(10px) saturate(135%)',
-  WebkitBackdropFilter: 'blur(10px) saturate(135%)',
-}
-
-const webOverlayStyle: WebOverlayStyle = {
-  position: 'fixed',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-  zIndex: 1000,
-}
-
-const sheetDismissDistance = 360
-const sheetDismissThreshold = 96
-const sheetDismissVelocity = 900
-
-function BackdropBlur({
-  tint,
-}: BackdropBlurProps) {
-  if (Platform.OS === 'web') {
-    return (
-      <View
-        pointerEvents="none"
-        style={[
-          styles.backdropBlur,
-          webBackdropBlurStyle,
-        ]}
-      />
-    )
-  }
-
-  return (
-    <BlurView
-      intensity={24}
-      pointerEvents="none"
-      style={styles.backdropBlur}
-      tint={tint}
-    />
+    </BottomSheet>
   )
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    paddingHorizontal: spacing.three,
-    paddingTop: spacing.four,
-  },
-  backdropBlur: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  dialog: {
-    width: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
-    gap: spacing.four,
-    padding: spacing.five,
-  },
-  handleTrack: {
-    alignItems: 'center',
-    marginTop: -spacing.two,
-  },
-  handle: {
-    width: 44,
-    height: 4,
-    borderRadius: 2,
-    opacity: 0.64,
-  },
   hero: {
     alignItems: 'center',
     gap: spacing.three,
