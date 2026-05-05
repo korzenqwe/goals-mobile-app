@@ -1,4 +1,6 @@
-import type { ComponentType } from 'react'
+import type {
+  ComponentType,
+} from 'react'
 import {
   StyleSheet,
   Text,
@@ -9,8 +11,12 @@ import {
   typography,
   useAppTheme,
 } from '@/shared/theme'
-import { GlassPanel } from '@/shared/ui/glass-panel'
-import { IconButton } from '@/shared/ui/icon-button'
+import {
+  GlassPanel,
+} from '@/shared/ui/glass-panel'
+import {
+  IconButton,
+} from '@/shared/ui/icon-button'
 
 type EmptyStateProps = {
   icon: ComponentType<{ color?: string, size?: number, strokeWidth?: number }>

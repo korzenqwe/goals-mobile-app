@@ -1,4 +1,6 @@
-import type { ComponentType } from 'react'
+import type {
+  ComponentType,
+} from 'react'
 import {
   CalendarCheck2,
   Flame,
@@ -11,7 +13,9 @@ import {
   View,
 } from 'react-native'
 
-import type { GoalStats } from '@/features/goals/domain/types'
+import type {
+  GoalStats,
+} from '@/features/goals/domain/types'
 import {
   radii,
   spacing,

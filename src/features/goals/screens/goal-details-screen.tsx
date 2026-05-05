@@ -8,17 +8,29 @@ import {
   Circle,
   Edit3,
 } from 'lucide-react-native'
-import { useState } from 'react'
+import {
+  useState,
+} from 'react'
 import {
   StyleSheet,
   Text,
 } from 'react-native'
 
-import { GoalCalendarPlaceholder } from '@/features/goals/components/goal-calendar-placeholder'
-import { GoalStatsPanel } from '@/features/goals/components/goal-stats-panel'
-import { useGoal } from '@/features/goals/hooks/use-goal'
-import { getLocalDateString } from '@/shared/date'
-import { goalsRepository } from '@/shared/db'
+import {
+  GoalCalendarPlaceholder,
+} from '@/features/goals/components/goal-calendar-placeholder'
+import {
+  GoalStatsPanel,
+} from '@/features/goals/components/goal-stats-panel'
+import {
+  useGoal,
+} from '@/features/goals/hooks/use-goal'
+import {
+  getLocalDateString,
+} from '@/shared/date'
+import {
+  goalsRepository,
+} from '@/shared/db'
 import {
   typography,
   useAppTheme,

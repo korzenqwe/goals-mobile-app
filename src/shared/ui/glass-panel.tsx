@@ -1,5 +1,9 @@
-import { BlurView } from 'expo-blur'
-import type { PropsWithChildren } from 'react'
+import {
+  BlurView,
+} from 'expo-blur'
+import type {
+  PropsWithChildren,
+} from 'react'
 import {
   Platform,
   type StyleProp,

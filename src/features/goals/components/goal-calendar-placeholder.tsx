@@ -1,4 +1,6 @@
-import { CalendarDays } from 'lucide-react-native'
+import {
+  CalendarDays,
+} from 'lucide-react-native'
 import {
   StyleSheet,
   Text,
@@ -10,7 +12,9 @@ import {
   typography,
   useAppTheme,
 } from '@/shared/theme'
-import { GlassPanel } from '@/shared/ui'
+import {
+  GlassPanel,
+} from '@/shared/ui'
 
 export function GoalCalendarPlaceholder() {
   const theme = useAppTheme()

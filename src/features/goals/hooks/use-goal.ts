@@ -1,4 +1,6 @@
-import { useFocusEffect } from '@react-navigation/native'
+import {
+  useFocusEffect,
+} from '@react-navigation/native'
 import {
   useCallback,
   useState,
@@ -8,8 +10,12 @@ import type {
   Goal,
   GoalStats,
 } from '@/features/goals/domain/types'
-import { getLocalDateString } from '@/shared/date'
-import { goalsRepository } from '@/shared/db'
+import {
+  getLocalDateString,
+} from '@/shared/date'
+import {
+  goalsRepository,
+} from '@/shared/db'
 
 export function useGoal(goalId: string) {
   const [goal, setGoal] = useState<Goal | null>(null)

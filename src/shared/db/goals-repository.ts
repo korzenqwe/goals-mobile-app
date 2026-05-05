@@ -13,7 +13,9 @@ import {
   getLocalDateString,
   type LocalDateString,
 } from '@/shared/date'
-import { getDatabaseAsync } from '@/shared/db/database'
+import {
+  getDatabaseAsync,
+} from '@/shared/db/database'
 
 export type ListGoalsParams = {
   status?: GoalStatus

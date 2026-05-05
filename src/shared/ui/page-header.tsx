@@ -1,5 +1,9 @@
-import { ChevronLeft } from 'lucide-react-native'
-import { useRouter } from 'expo-router'
+import {
+  ChevronLeft,
+} from 'lucide-react-native'
+import {
+  useRouter,
+} from 'expo-router'
 import {
   StyleSheet,
   Text,
@@ -11,7 +15,9 @@ import {
   typography,
   useAppTheme,
 } from '@/shared/theme'
-import { IconButton } from '@/shared/ui/icon-button'
+import {
+  IconButton,
+} from '@/shared/ui/icon-button'
 
 type PageHeaderProps = {
   title: string

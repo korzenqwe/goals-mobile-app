@@ -1,12 +1,18 @@
 import * as Haptics from 'expo-haptics'
-import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import {
+  useRouter,
+} from 'expo-router'
+import {
+  useState,
+} from 'react'
 
 import {
   GoalForm,
   type GoalFormValues,
 } from '@/features/goals/components/goal-form'
-import { goalsRepository } from '@/shared/db'
+import {
+  goalsRepository,
+} from '@/shared/db'
 import {
   AppScreen,
   PageHeader,

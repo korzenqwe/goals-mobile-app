@@ -3,8 +3,12 @@ import {
   type SQLiteDatabase,
 } from 'expo-sqlite'
 
-import { migrations } from '@/shared/db/migrations'
-import { DATABASE_NAME } from '@/shared/db/schema'
+import {
+  migrations,
+} from '@/shared/db/migrations'
+import {
+  DATABASE_NAME,
+} from '@/shared/db/schema'
 
 let databasePromise: Promise<SQLiteDatabase> | null = null
 

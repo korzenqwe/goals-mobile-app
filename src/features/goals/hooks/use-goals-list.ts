@@ -1,12 +1,20 @@
-import { useFocusEffect } from '@react-navigation/native'
+import {
+  useFocusEffect,
+} from '@react-navigation/native'
 import {
   useCallback,
   useState,
 } from 'react'
 
-import type { GoalViewModel } from '@/features/goals/domain/types'
-import { getLocalDateString } from '@/shared/date'
-import { goalsRepository } from '@/shared/db'
+import type {
+  GoalViewModel,
+} from '@/features/goals/domain/types'
+import {
+  getLocalDateString,
+} from '@/shared/date'
+import {
+  goalsRepository,
+} from '@/shared/db'
 
 export function useGoalsList() {
   const [goals, setGoals] = useState<GoalViewModel[]>([])

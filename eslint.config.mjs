@@ -1,4 +1,6 @@
-import { fileURLToPath } from 'node:url'
+import {
+  fileURLToPath,
+} from 'node:url'
 
 import antfu from '@antfu/eslint-config'
 import expo from 'eslint-plugin-expo'
@@ -75,6 +77,16 @@ export default antfu(
       'style/jsx-curly-newline': 'off',
       'style/jsx-one-expression-per-line': 'off',
       'style/multiline-ternary': 'off',
+      'style/object-curly-newline': [
+        'error',
+        {
+          ImportDeclaration: {
+            consistent: true,
+            minProperties: 1,
+            multiline: true,
+          },
+        },
+      ],
       'style/operator-linebreak': 'off',
       'style/semi': [
         'error',

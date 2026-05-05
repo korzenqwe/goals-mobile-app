@@ -1,4 +1,6 @@
-import type { LocalDateString } from '@/shared/date'
+import type {
+  LocalDateString,
+} from '@/shared/date'
 
 export type ISODateTimeString = string
 

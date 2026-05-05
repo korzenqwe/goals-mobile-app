@@ -1,11 +1,17 @@
-import type { PropsWithChildren } from 'react'
+import type {
+  PropsWithChildren,
+} from 'react'
 import {
   StyleSheet,
   View,
 } from 'react-native'
 
-import { spacing } from '@/shared/theme'
-import { GlassPanel } from '@/shared/ui/glass-panel'
+import {
+  spacing,
+} from '@/shared/theme'
+import {
+  GlassPanel,
+} from '@/shared/ui/glass-panel'
 
 export function FloatingActionBar({ children }: PropsWithChildren) {
   return (

@@ -4,7 +4,9 @@ import {
   test,
 } from 'bun:test'
 
-import { calculateCompletionStats } from './index'
+import {
+  calculateCompletionStats,
+} from './index'
 
 describe('calculateCompletionStats', () => {
   test('returns zero streaks without completions', () => {

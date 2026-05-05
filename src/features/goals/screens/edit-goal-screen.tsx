@@ -3,8 +3,12 @@ import {
   useLocalSearchParams,
   useRouter,
 } from 'expo-router'
-import { Trash2 } from 'lucide-react-native'
-import { useState } from 'react'
+import {
+  Trash2,
+} from 'lucide-react-native'
+import {
+  useState,
+} from 'react'
 import {
   StyleSheet,
   Text,
@@ -15,8 +19,12 @@ import {
   GoalForm,
   type GoalFormValues,
 } from '@/features/goals/components/goal-form'
-import { useGoal } from '@/features/goals/hooks/use-goal'
-import { goalsRepository } from '@/shared/db'
+import {
+  useGoal,
+} from '@/features/goals/hooks/use-goal'
+import {
+  goalsRepository,
+} from '@/shared/db'
 import {
   spacing,
   typography,

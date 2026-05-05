@@ -15,8 +15,12 @@ import {
   typography,
   useAppTheme,
 } from '@/shared/theme'
-import { GlassPanel } from '@/shared/ui/glass-panel'
-import { IconButton } from '@/shared/ui/icon-button'
+import {
+  GlassPanel,
+} from '@/shared/ui/glass-panel'
+import {
+  IconButton,
+} from '@/shared/ui/icon-button'
 
 type ConfirmationDialogProps = {
   cancelLabel?: string
