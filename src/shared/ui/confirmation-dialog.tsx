@@ -66,6 +66,81 @@ export function ConfirmationDialog({
     }
   }
 
+  const dialog = (
+    <GlassPanel style={styles.dialog} variant="modal">
+      <View style={styles.header}>
+        <View
+          style={[
+            styles.iconFrame,
+            {
+              backgroundColor: theme.dangerSoft,
+              borderColor: theme.danger,
+            },
+          ]}
+        >
+          <AlertTriangle color={theme.danger} size={20} strokeWidth={2.4} />
+        </View>
+        <View style={styles.copy}>
+          <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+          <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>
+        </View>
+      </View>
+      <View style={styles.actions}>
+        <IconButton
+          disabled={isConfirming}
+          icon={X}
+          label={cancelLabel}
+          onPress={handleCancel}
+          variant="ghost"
+        />
+        <IconButton
+          disabled={isConfirming}
+          icon={AlertTriangle}
+          label={confirmButtonLabel}
+          onPress={onConfirm}
+          variant="danger"
+        />
+      </View>
+    </GlassPanel>
+  )
+
+  if (Platform.OS === 'web') {
+    let pointerEvents: 'auto' | 'none' = 'none'
+    let opacity = 0
+
+    if (visible) {
+      pointerEvents = 'auto'
+      opacity = 1
+    }
+
+    return (
+      <View
+        accessibilityViewIsModal={visible}
+        pointerEvents={pointerEvents}
+        style={[
+          styles.overlay,
+          webOverlayStyle,
+          {
+            opacity,
+          },
+        ]}
+      >
+        <BackdropBlur tint={scheme} />
+        <Pressable
+          accessibilityLabel="Закрыть подтверждение"
+          style={[
+            styles.backdrop,
+            {
+              backgroundColor: palette.backdrop,
+            },
+          ]}
+          onPress={handleCancel}
+        />
+        {dialog}
+      </View>
+    )
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -86,41 +161,7 @@ export function ConfirmationDialog({
           ]}
           onPress={handleCancel}
         />
-        <GlassPanel style={styles.dialog} variant="modal">
-          <View style={styles.header}>
-            <View
-              style={[
-                styles.iconFrame,
-                {
-                  backgroundColor: theme.dangerSoft,
-                  borderColor: theme.danger,
-                },
-              ]}
-            >
-              <AlertTriangle color={theme.danger} size={20} strokeWidth={2.4} />
-            </View>
-            <View style={styles.copy}>
-              <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
-              <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>
-            </View>
-          </View>
-          <View style={styles.actions}>
-            <IconButton
-              disabled={isConfirming}
-              icon={X}
-              label={cancelLabel}
-              onPress={handleCancel}
-              variant="ghost"
-            />
-            <IconButton
-              disabled={isConfirming}
-              icon={AlertTriangle}
-              label={confirmButtonLabel}
-              onPress={onConfirm}
-              variant="danger"
-            />
-          </View>
-        </GlassPanel>
+        {dialog}
       </View>
     </Modal>
   )
@@ -135,9 +176,22 @@ type WebBackdropStyle = ViewStyle & {
   backdropFilter?: string
 }
 
+type WebOverlayStyle = ViewStyle & {
+  position: 'fixed'
+}
+
 const webBackdropBlurStyle: WebBackdropStyle = {
   backdropFilter: 'blur(22px) saturate(170%)',
   WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+}
+
+const webOverlayStyle: WebOverlayStyle = {
+  position: 'fixed',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  zIndex: 1000,
 }
 
 function BackdropBlur({
