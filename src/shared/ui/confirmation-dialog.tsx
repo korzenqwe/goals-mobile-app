@@ -68,36 +68,58 @@ export function ConfirmationDialog({
 
   const dialog = (
     <GlassPanel style={styles.dialog} variant="modal">
-      <View style={styles.header}>
+      <View style={styles.handleTrack}>
+        <View style={[styles.handle, { backgroundColor: theme.glassEdge }]} />
+      </View>
+
+      <View style={styles.hero}>
         <View
           style={[
-            styles.iconFrame,
+            styles.iconHalo,
             {
               backgroundColor: theme.dangerSoft,
-              borderColor: theme.danger,
+              borderColor: theme.glassBorder,
             },
           ]}
         >
-          <AlertTriangle color={theme.danger} size={20} strokeWidth={2.4} />
+          <View
+            style={[
+              styles.iconFrame,
+              {
+                backgroundColor: theme.surfaceElevated,
+                borderColor: theme.danger,
+              },
+            ]}
+          >
+            <AlertTriangle color={theme.danger} size={24} strokeWidth={2.3} />
+          </View>
         </View>
         <View style={styles.copy}>
           <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
           <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>
         </View>
       </View>
+
+      <View style={styles.notice}>
+        <View style={[styles.noticeMark, { backgroundColor: theme.danger }]} />
+        <Text style={[styles.noticeText, { color: theme.textSecondary }]}>Действие нельзя отменить</Text>
+      </View>
+
       <View style={styles.actions}>
         <IconButton
           disabled={isConfirming}
           icon={X}
           label={cancelLabel}
           onPress={handleCancel}
-          variant="ghost"
+          style={styles.actionButton}
+          variant="soft"
         />
         <IconButton
           disabled={isConfirming}
           icon={AlertTriangle}
           label={confirmButtonLabel}
           onPress={onConfirm}
+          style={styles.actionButton}
           variant="danger"
         />
       </View>
@@ -181,8 +203,8 @@ type WebOverlayStyle = ViewStyle & {
 }
 
 const webBackdropBlurStyle: WebBackdropStyle = {
-  backdropFilter: 'blur(22px) saturate(170%)',
-  WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+  backdropFilter: 'blur(10px) saturate(135%)',
+  WebkitBackdropFilter: 'blur(10px) saturate(135%)',
 }
 
 const webOverlayStyle: WebOverlayStyle = {
@@ -211,7 +233,7 @@ function BackdropBlur({
 
   return (
     <BlurView
-      intensity={46}
+      intensity={24}
       pointerEvents="none"
       style={styles.backdropBlur}
       tint={tint}
@@ -238,35 +260,74 @@ const styles = StyleSheet.create({
     gap: spacing.four,
     padding: spacing.five,
   },
-  header: {
-    flexDirection: 'row',
-    gap: spacing.three,
-    alignItems: 'flex-start',
+  handleTrack: {
+    alignItems: 'center',
+    marginTop: -spacing.two,
   },
-  iconFrame: {
-    width: 40,
-    height: 40,
+  handle: {
+    width: 44,
+    height: 4,
+    borderRadius: 2,
+    opacity: 0.64,
+  },
+  hero: {
+    alignItems: 'center',
+    gap: spacing.three,
+  },
+  iconHalo: {
+    width: 72,
+    height: 72,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 20,
+    borderRadius: 36,
+  },
+  iconFrame: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 24,
   },
   copy: {
-    flex: 1,
-    gap: spacing.one,
+    alignItems: 'center',
+    gap: spacing.two,
   },
   title: {
     fontSize: typography.subtitle.fontSize,
+    lineHeight: typography.subtitle.lineHeight,
     fontWeight: typography.subtitle.fontWeight,
+    textAlign: 'center',
   },
   message: {
     fontSize: typography.body.fontSize,
     lineHeight: typography.body.lineHeight,
+    textAlign: 'center',
+  },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: spacing.two,
+    paddingHorizontal: spacing.two,
+  },
+  noticeMark: {
+    width: 3,
+    height: 18,
+    borderRadius: 2,
+  },
+  noticeText: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontWeight: '600',
   },
   actions: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: spacing.two,
+  },
+  actionButton: {
+    flex: 1,
   },
 })

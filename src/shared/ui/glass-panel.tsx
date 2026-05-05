@@ -161,9 +161,9 @@ function getGlassPanelState(
 
   if (variant === 'modal') {
     state.backgroundColor = palette.glassStrong
-    state.backdropFilter = 'blur(28px) saturate(190%)'
+    state.backdropFilter = 'blur(18px) saturate(165%)'
     state.glassEffectStyle = 'regular'
-    state.intensity = 64
+    state.intensity = 44
     state.isInteractive = true
     state.shadowOpacity = 0.20
     state.shadowRadius = 32
