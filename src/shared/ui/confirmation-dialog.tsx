@@ -15,6 +15,9 @@ import {
   View,
   type ViewStyle,
 } from 'react-native'
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context'
 
 import {
   colors,
@@ -51,10 +54,16 @@ export function ConfirmationDialog({
   title,
   visible,
 }: ConfirmationDialogProps) {
+  const insets = useSafeAreaInsets()
   const theme = useAppTheme()
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
+  let bottomInset = spacing.four
   let confirmButtonLabel = confirmLabel
+
+  if (insets.bottom > 0) {
+    bottomInset = insets.bottom + spacing.two
+  }
 
   if (isConfirming) {
     confirmButtonLabel = 'Удаляем...'
@@ -143,6 +152,9 @@ export function ConfirmationDialog({
           styles.overlay,
           webOverlayStyle,
           {
+            paddingBottom: bottomInset,
+          },
+          {
             opacity,
           },
         ]}
@@ -165,13 +177,21 @@ export function ConfirmationDialog({
 
   return (
     <Modal
-      animationType="fade"
+      animationType="slide"
       onRequestClose={handleCancel}
       transparent
       visible={visible}
       statusBarTranslucent
     >
-      <View accessibilityViewIsModal style={styles.overlay}>
+      <View
+        accessibilityViewIsModal
+        style={[
+          styles.overlay,
+          {
+            paddingBottom: bottomInset,
+          },
+        ]}
+      >
         <BackdropBlur tint={scheme} />
         <Pressable
           accessibilityLabel="Закрыть подтверждение"
@@ -244,8 +264,9 @@ function BackdropBlur({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'center',
-    padding: spacing.four,
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.three,
+    paddingTop: spacing.four,
   },
   backdropBlur: {
     ...StyleSheet.absoluteFillObject,
@@ -255,7 +276,7 @@ const styles = StyleSheet.create({
   },
   dialog: {
     width: '100%',
-    maxWidth: 440,
+    maxWidth: 520,
     alignSelf: 'center',
     gap: spacing.four,
     padding: spacing.five,
