@@ -15,7 +15,6 @@ import {
   useState,
 } from 'react'
 import {
-  Animated,
   StyleSheet,
   Text,
   View,
@@ -57,10 +56,8 @@ export function ToastProvider({
 }: PropsWithChildren) {
   const insets = useSafeAreaInsets()
   const theme = useAppTheme()
-  const opacity = useRef(new Animated.Value(0)).current
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastIdRef = useRef(0)
-  const translateY = useRef(new Animated.Value(-12)).current
   const [
     toast,
     setToast,
@@ -76,36 +73,19 @@ export function ToastProvider({
   const hideToast = useCallback((toastId: number) => {
     clearDismissTimer()
 
-    Animated.parallel([
-      Animated.timing(opacity, {
-        duration: 170,
-        toValue: 0,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        duration: 170,
-        toValue: -12,
-        useNativeDriver: true,
-      }),
-    ]).start((result) => {
-      if (!result.finished) {
-        return
+    setToast((currentToast) => {
+      if (currentToast?.id === toastId) {
+        return null
       }
 
-      if (toastIdRef.current === toastId) {
-        setToast(null)
-      }
+      return currentToast
     })
   }, [
     clearDismissTimer,
-    opacity,
-    translateY,
   ])
 
   const showToast = useCallback((input: ToastInput) => {
     clearDismissTimer()
-    opacity.stopAnimation()
-    translateY.stopAnimation()
 
     let variant: ToastVariant = 'success'
 
@@ -122,29 +102,10 @@ export function ToastProvider({
       variant,
     })
 
-    Animated.parallel([
-      Animated.spring(opacity, {
-        damping: 18,
-        mass: 0.8,
-        stiffness: 220,
-        toValue: 1,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateY, {
-        damping: 18,
-        mass: 0.8,
-        stiffness: 220,
-        toValue: 0,
-        useNativeDriver: true,
-      }),
-    ]).start()
-
     timerRef.current = setTimeout(hideToast, toastVisibilityDuration, nextToastId)
   }, [
     clearDismissTimer,
     hideToast,
-    opacity,
-    translateY,
   ])
 
   useEffect(() => clearDismissTimer, [
@@ -160,6 +121,7 @@ export function ToastProvider({
   let iconBackgroundColor: string = theme.accentSoft
   let icon = <CircleCheck color={accentColor} size={20} strokeWidth={2.5} />
   let message = ''
+  let toastContent = null
 
   if (toast) {
     message = toast.message
@@ -169,6 +131,19 @@ export function ToastProvider({
       iconBackgroundColor = theme.dangerSoft
       icon = <CircleAlert color={accentColor} size={20} strokeWidth={2.5} />
     }
+
+    toastContent = (
+      <View style={styles.toastShell}>
+        <GlassPanel shape="capsule" style={styles.toast} variant="toast">
+          <View style={[styles.iconFrame, { backgroundColor: iconBackgroundColor }]}>
+            {icon}
+          </View>
+          <Text numberOfLines={2} style={[styles.message, { color: theme.text }]}>
+            {message}
+          </Text>
+        </GlassPanel>
+      </View>
+    )
   }
 
   return (
@@ -183,28 +158,7 @@ export function ToastProvider({
           },
         ]}
       >
-        <Animated.View
-          style={[
-            styles.toastShell,
-            {
-              opacity,
-              transform: [
-                {
-                  translateY,
-                },
-              ],
-            },
-          ]}
-        >
-          <GlassPanel shape="capsule" style={styles.toast} variant="toast">
-            <View style={[styles.iconFrame, { backgroundColor: iconBackgroundColor }]}>
-              {icon}
-            </View>
-            <Text numberOfLines={2} style={[styles.message, { color: theme.text }]}>
-              {message}
-            </Text>
-          </GlassPanel>
-        </Animated.View>
+        {toastContent}
       </View>
     </ToastContext.Provider>
   )

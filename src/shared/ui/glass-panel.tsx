@@ -1,4 +1,5 @@
 import {
+  type BlurMethod,
   type BlurTint,
   BlurView,
 } from 'expo-blur'
@@ -30,17 +31,12 @@ type GlassPanelProps = PropsWithChildren<{
 type GlassPanelState = {
   backgroundColor: string
   borderColor: string
+  blurMethod: BlurMethod
   blurTint: BlurTint
   contentBackgroundColor: string
   intensity: number
   shadowOpacity: number
   shadowRadius: number
-  webBackdropFilter: string
-}
-
-type WebBlurStyle = ViewStyle & {
-  WebkitBackdropFilter?: string
-  backdropFilter?: string
 }
 
 export function GlassPanel({
@@ -70,7 +66,7 @@ export function GlassPanel({
     },
     style,
   ]
-  const decoratedContent = (
+  const content = (
     <>
       <View
         pointerEvents="none"
@@ -96,44 +92,15 @@ export function GlassPanel({
     </>
   )
 
-  if (Platform.OS === 'android') {
-    return (
-      <View style={panelStyle}>
-        {decoratedContent}
-      </View>
-    )
-  }
-
-  if (Platform.OS === 'web') {
-    return (
-      <View style={panelStyle}>
-        <View
-          pointerEvents="none"
-          style={[
-            styles.blur,
-            getWebBlurStyle(panelState.webBackdropFilter, borderRadius),
-          ]}
-        />
-        {decoratedContent}
-      </View>
-    )
-  }
-
   return (
-    <View style={panelStyle}>
-      <BlurView
-        intensity={panelState.intensity}
-        pointerEvents="none"
-        style={[
-          styles.blur,
-          {
-            borderRadius,
-          },
-        ]}
-        tint={panelState.blurTint}
-      />
-      {decoratedContent}
-    </View>
+    <BlurView
+      blurMethod={panelState.blurMethod}
+      intensity={panelState.intensity}
+      style={panelStyle}
+      tint={panelState.blurTint}
+    >
+      {content}
+    </BlurView>
   )
 }
 
@@ -145,12 +112,12 @@ function getGlassPanelState(
   const state: GlassPanelState = {
     backgroundColor: palette.glass,
     borderColor: palette.glassBorder,
+    blurMethod: 'none',
     blurTint: resolveBlurTint(scheme, 'default'),
     contentBackgroundColor: 'transparent',
     intensity: 34,
     shadowOpacity: 0.10,
     shadowRadius: 18,
-    webBackdropFilter: 'blur(16px) saturate(170%)',
   }
 
   if (variant === 'chrome') {
@@ -159,7 +126,6 @@ function getGlassPanelState(
     state.intensity = 46
     state.shadowOpacity = 0.16
     state.shadowRadius = 24
-    state.webBackdropFilter = 'blur(22px) saturate(190%)'
   }
 
   if (variant === 'modal') {
@@ -168,38 +134,23 @@ function getGlassPanelState(
     state.intensity = 44
     state.shadowOpacity = 0.20
     state.shadowRadius = 32
-    state.webBackdropFilter = 'blur(20px) saturate(175%)'
   }
 
   if (variant === 'toast') {
-    state.backgroundColor = palette.glassFloating
-    state.blurTint = resolveBlurTint(scheme, 'toast')
-    state.intensity = 90
-    state.shadowOpacity = 0.24
-    state.shadowRadius = 26
-    state.webBackdropFilter = 'blur(28px) saturate(210%)'
+    state.backgroundColor = palette.glassStrong
+    state.blurTint = resolveBlurTint(scheme, 'modal')
+    state.intensity = 44
+    state.shadowOpacity = 0.20
+    state.shadowRadius = 32
   }
 
   if (Platform.OS === 'android') {
     state.backgroundColor = palette.surfaceElevated
     state.contentBackgroundColor = palette.surfaceElevated
     state.intensity = 0
-
-    if (variant === 'toast') {
-      state.backgroundColor = palette.glassFloating
-      state.contentBackgroundColor = palette.glassFloating
-    }
   }
 
   return state
-}
-
-function getWebBlurStyle(backdropFilter: string, borderRadius: number): WebBlurStyle {
-  return {
-    backdropFilter,
-    borderRadius,
-    WebkitBackdropFilter: backdropFilter,
-  }
 }
 
 function resolveBlurTint(
@@ -207,21 +158,12 @@ function resolveBlurTint(
   variant: NonNullable<GlassPanelProps['variant']>,
 ): BlurTint {
   if (scheme === 'dark') {
-    if (variant === 'toast') {
-      return 'default'
-    }
-
     if (variant === 'chrome') {
       return 'systemThinMaterialDark'
     }
 
     return 'dark'
   }
-
-  if (variant === 'toast') {
-    return 'default'
-  }
-
   if (variant === 'chrome') {
     return 'systemThinMaterialLight'
   }
@@ -240,10 +182,6 @@ const styles = StyleSheet.create({
       height: 12,
     },
     elevation: 8,
-  },
-  blur: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
   },
   tint: {
     ...StyleSheet.absoluteFillObject,
