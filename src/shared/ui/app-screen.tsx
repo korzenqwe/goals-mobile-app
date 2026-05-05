@@ -23,7 +23,11 @@ type AppScreenProps = PropsWithChildren<{
   scroll?: boolean
 }>
 
-export function AppScreen({ children, footer, scroll = false }: AppScreenProps) {
+export function AppScreen({
+  children,
+  footer,
+  scroll = false,
+}: AppScreenProps) {
   const scheme = resolveColorScheme(useColorScheme())
   const backgroundColor = colors[scheme].background
 

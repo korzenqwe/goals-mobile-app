@@ -25,7 +25,11 @@ type PageHeaderProps = {
   showBackButton?: boolean
 }
 
-export function PageHeader({ title, subtitle, showBackButton = false }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  showBackButton = false,
+}: PageHeaderProps) {
   const router = useRouter()
   const theme = useAppTheme()
   let backButton = null

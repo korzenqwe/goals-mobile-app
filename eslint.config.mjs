@@ -85,6 +85,11 @@ export default antfu(
             minProperties: 1,
             multiline: true,
           },
+          ObjectPattern: {
+            consistent: true,
+            minProperties: 1,
+            multiline: true,
+          },
         },
       ],
       'style/operator-linebreak': 'off',

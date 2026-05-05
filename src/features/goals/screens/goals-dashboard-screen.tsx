@@ -44,7 +44,13 @@ import {
 export function GoalsDashboardScreen() {
   const router = useRouter()
   const theme = useAppTheme()
-  const { error, goals, isLoading, refresh, refreshGoal } = useGoalsList()
+  const {
+    error,
+    goals,
+    isLoading,
+    refresh,
+    refreshGoal,
+  } = useGoalsList()
   const [actionError, setActionError] = useState<string | null>(null)
   const [togglingGoalId, setTogglingGoalId] = useState<string | null>(null)
 
@@ -111,7 +117,11 @@ export function GoalsDashboardScreen() {
   if (goals.length > 0) {
     content = (
       <View style={styles.list}>
-        {goals.map(({ goal, isCompletedToday, stats }) => {
+        {goals.map(({
+          goal,
+          isCompletedToday,
+          stats,
+        }) => {
           const isGoalUpdating = togglingGoalId === goal.id
 
           return (

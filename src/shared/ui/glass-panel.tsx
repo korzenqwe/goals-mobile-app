@@ -23,7 +23,10 @@ type GlassPanelProps = PropsWithChildren<{
   style?: StyleProp<ViewStyle>
 }>
 
-export function GlassPanel({ children, style }: GlassPanelProps) {
+export function GlassPanel({
+  children,
+  style,
+}: GlassPanelProps) {
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
   let intensity = 0

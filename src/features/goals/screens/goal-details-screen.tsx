@@ -44,10 +44,19 @@ import {
 
 export function GoalDetailsScreen() {
   const router = useRouter()
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const {
+    id,
+  } = useLocalSearchParams<{ id: string }>()
   const goalId = id ?? ''
   const theme = useAppTheme()
-  const { error, goal, isCompletedToday, isLoading, refresh, stats } = useGoal(goalId)
+  const {
+    error,
+    goal,
+    isCompletedToday,
+    isLoading,
+    refresh,
+    stats,
+  } = useGoal(goalId)
   const [actionError, setActionError] = useState<string | null>(null)
   const [isTogglingToday, setIsTogglingToday] = useState(false)
   let CompletionIcon = Circle

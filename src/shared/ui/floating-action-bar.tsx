@@ -13,7 +13,9 @@ import {
   GlassPanel,
 } from '@/shared/ui/glass-panel'
 
-export function FloatingActionBar({ children }: PropsWithChildren) {
+export function FloatingActionBar({
+  children,
+}: PropsWithChildren) {
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
       <GlassPanel style={styles.bar}>{children}</GlassPanel>

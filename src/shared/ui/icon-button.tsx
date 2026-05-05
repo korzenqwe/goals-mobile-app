@@ -59,7 +59,9 @@ export function IconButton({
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
+      style={({
+        pressed,
+      }) => [
         styles.button,
         getButtonStateStyle({
           disabled,

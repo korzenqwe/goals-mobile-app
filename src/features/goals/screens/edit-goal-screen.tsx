@@ -41,9 +41,15 @@ import {
 export function EditGoalScreen() {
   const router = useRouter()
   const theme = useAppTheme()
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const {
+    id,
+  } = useLocalSearchParams<{ id: string }>()
   const goalId = id ?? ''
-  const { error: loadError, goal, isLoading } = useGoal(goalId)
+  const {
+    error: loadError,
+    goal,
+    isLoading,
+  } = useGoal(goalId)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false)

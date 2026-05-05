@@ -33,7 +33,9 @@ type StatTileProps = {
   value: string
 }
 
-export function GoalStatsPanel({ stats }: GoalStatsPanelProps) {
+export function GoalStatsPanel({
+  stats,
+}: GoalStatsPanelProps) {
   return (
     <View style={styles.grid}>
       <StatTile icon={Flame} label="Текущая серия" value={String(stats.currentStreak)} />
@@ -48,7 +50,11 @@ export function GoalStatsPanel({ stats }: GoalStatsPanelProps) {
   )
 }
 
-function StatTile({ icon: Icon, label, value }: StatTileProps) {
+function StatTile({
+  icon: Icon,
+  label,
+  value,
+}: StatTileProps) {
   const theme = useAppTheme()
 
   return (
