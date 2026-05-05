@@ -1,11 +1,4 @@
 import type {
-  SQLiteDatabase,
-} from 'expo-sqlite'
-import {
-  Platform,
-} from 'react-native'
-
-import type {
   CreateGoalInput,
   Goal,
   GoalCompletion,
@@ -23,6 +16,10 @@ import {
 import {
   getDatabaseAsync,
 } from '@/shared/db/database'
+import {
+  runWriteTransaction,
+  type SQLiteTransactionRunner,
+} from '@/shared/db/transactions'
 
 export type ListGoalsParams = {
   status?: GoalStatus
@@ -67,8 +64,6 @@ type CompletionRow = {
   note: string | null
   created_at: string
 }
-
-type CompletionStatementRunner = Pick<SQLiteDatabase, 'runAsync'>
 
 class SQLiteGoalsRepository implements GoalsRepository {
   async listGoals(params: ListGoalsParams = {}) {
@@ -270,21 +265,10 @@ class SQLiteGoalsRepository implements GoalsRepository {
 
   async toggleCompletion(input: ToggleCompletionInput) {
     const database = await getDatabaseAsync()
-    let toggledCompletion: GoalCompletion | null = null
 
-    if (Platform.OS === 'web') {
-      await database.withTransactionAsync(async () => {
-        toggledCompletion = await runToggleCompletionStatements(database, input)
-      })
-
-      return toggledCompletion
-    }
-
-    await database.withExclusiveTransactionAsync(async (transaction) => {
-      toggledCompletion = await runToggleCompletionStatements(transaction, input)
+    return runWriteTransaction<GoalCompletion | null>(database, async (transaction) => {
+      return runToggleCompletionStatements(transaction, input)
     })
-
-    return toggledCompletion
   }
 
   async updateCompletionNote(goalId: string, date: LocalDateString, note: string | null) {
@@ -405,7 +389,7 @@ function normalizeNullableText(value?: string | null) {
 }
 
 async function runToggleCompletionStatements(
-  runner: CompletionStatementRunner,
+  runner: SQLiteTransactionRunner,
   input: ToggleCompletionInput,
 ) {
   const deleteResult = await runner.runAsync(
