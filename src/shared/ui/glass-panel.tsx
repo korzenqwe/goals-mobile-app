@@ -35,6 +35,12 @@ type GlassPanelState = {
   intensity: number
   shadowOpacity: number
   shadowRadius: number
+  webBackdropFilter: string
+}
+
+type WebBlurStyle = ViewStyle & {
+  WebkitBackdropFilter?: string
+  backdropFilter?: string
 }
 
 export function GlassPanel({
@@ -98,6 +104,21 @@ export function GlassPanel({
     )
   }
 
+  if (Platform.OS === 'web') {
+    return (
+      <View style={panelStyle}>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.blur,
+            getWebBlurStyle(panelState.webBackdropFilter, borderRadius),
+          ]}
+        />
+        {decoratedContent}
+      </View>
+    )
+  }
+
   return (
     <View style={panelStyle}>
       <BlurView
@@ -129,6 +150,7 @@ function getGlassPanelState(
     intensity: 34,
     shadowOpacity: 0.10,
     shadowRadius: 18,
+    webBackdropFilter: 'blur(16px) saturate(170%)',
   }
 
   if (variant === 'chrome') {
@@ -137,6 +159,7 @@ function getGlassPanelState(
     state.intensity = 46
     state.shadowOpacity = 0.16
     state.shadowRadius = 24
+    state.webBackdropFilter = 'blur(22px) saturate(190%)'
   }
 
   if (variant === 'modal') {
@@ -145,6 +168,7 @@ function getGlassPanelState(
     state.intensity = 44
     state.shadowOpacity = 0.20
     state.shadowRadius = 32
+    state.webBackdropFilter = 'blur(20px) saturate(175%)'
   }
 
   if (variant === 'toast') {
@@ -153,6 +177,7 @@ function getGlassPanelState(
     state.intensity = 90
     state.shadowOpacity = 0.24
     state.shadowRadius = 26
+    state.webBackdropFilter = 'blur(28px) saturate(210%)'
   }
 
   if (Platform.OS === 'android') {
@@ -167,6 +192,14 @@ function getGlassPanelState(
   }
 
   return state
+}
+
+function getWebBlurStyle(backdropFilter: string, borderRadius: number): WebBlurStyle {
+  return {
+    backdropFilter,
+    borderRadius,
+    WebkitBackdropFilter: backdropFilter,
+  }
 }
 
 function resolveBlurTint(
