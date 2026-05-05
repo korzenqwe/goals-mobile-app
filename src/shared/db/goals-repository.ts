@@ -1,4 +1,11 @@
 import type {
+  SQLiteDatabase,
+} from 'expo-sqlite'
+import {
+  Platform,
+} from 'react-native'
+
+import type {
   CreateGoalInput,
   Goal,
   GoalCompletion,
@@ -60,6 +67,8 @@ type CompletionRow = {
   note: string | null
   created_at: string
 }
+
+type CompletionStatementRunner = Pick<SQLiteDatabase, 'runAsync'>
 
 class SQLiteGoalsRepository implements GoalsRepository {
   async listGoals(params: ListGoalsParams = {}) {
@@ -263,43 +272,16 @@ class SQLiteGoalsRepository implements GoalsRepository {
     const database = await getDatabaseAsync()
     let toggledCompletion: GoalCompletion | null = null
 
+    if (Platform.OS === 'web') {
+      await database.withTransactionAsync(async () => {
+        toggledCompletion = await runToggleCompletionStatements(database, input)
+      })
+
+      return toggledCompletion
+    }
+
     await database.withExclusiveTransactionAsync(async (transaction) => {
-      const deleteResult = await transaction.runAsync(
-        `
-        DELETE FROM goal_completions
-        WHERE goal_id = ? AND date = ?;
-      `,
-        input.goalId,
-        input.date,
-      )
-
-      if (deleteResult.changes > 0) {
-        toggledCompletion = null
-        return
-      }
-
-      const now = new Date().toISOString()
-      const completion: GoalCompletion = {
-        id: createId('completion'),
-        goalId: input.goalId,
-        date: input.date,
-        note: normalizeNullableText(input.note),
-        createdAt: now,
-      }
-
-      await transaction.runAsync(
-        `
-        INSERT INTO goal_completions (id, goal_id, date, note, created_at)
-        VALUES (?, ?, ?, ?, ?);
-      `,
-        completion.id,
-        completion.goalId,
-        completion.date,
-        completion.note,
-        completion.createdAt,
-      )
-
-      toggledCompletion = completion
+      toggledCompletion = await runToggleCompletionStatements(transaction, input)
     })
 
     return toggledCompletion
@@ -420,6 +402,47 @@ function normalizeNullableText(value?: string | null) {
   const normalized = value?.trim()
 
   return normalized || null
+}
+
+async function runToggleCompletionStatements(
+  runner: CompletionStatementRunner,
+  input: ToggleCompletionInput,
+) {
+  const deleteResult = await runner.runAsync(
+    `
+      DELETE FROM goal_completions
+      WHERE goal_id = ? AND date = ?;
+    `,
+    input.goalId,
+    input.date,
+  )
+
+  if (deleteResult.changes > 0) {
+    return null
+  }
+
+  const now = new Date().toISOString()
+  const completion: GoalCompletion = {
+    id: createId('completion'),
+    goalId: input.goalId,
+    date: input.date,
+    note: normalizeNullableText(input.note),
+    createdAt: now,
+  }
+
+  await runner.runAsync(
+    `
+      INSERT INTO goal_completions (id, goal_id, date, note, created_at)
+      VALUES (?, ?, ?, ?, ?);
+    `,
+    completion.id,
+    completion.goalId,
+    completion.date,
+    completion.note,
+    completion.createdAt,
+  )
+
+  return completion
 }
 
 function createId(prefix: string) {
