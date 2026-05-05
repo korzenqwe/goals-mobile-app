@@ -6,16 +6,14 @@ import {
   BlurView,
 } from 'expo-blur'
 import {
-  useEffect,
-  useState,
-} from 'react'
-import {
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   useColorScheme,
   View,
+  type ViewStyle,
 } from 'react-native'
 
 import {
@@ -56,65 +54,11 @@ export function ConfirmationDialog({
   const theme = useAppTheme()
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
-  const [
-    isMounted,
-    setIsMounted,
-  ] = useState(visible)
-  const [
-    isReady,
-    setIsReady,
-  ] = useState(false)
   let confirmButtonLabel = confirmLabel
-  let overlayOpacity = 0
-  let overlayPointerEvents: 'auto' | 'none' = 'none'
 
   if (isConfirming) {
     confirmButtonLabel = 'Удаляем...'
   }
-
-  if (isReady) {
-    overlayOpacity = 1
-    overlayPointerEvents = 'auto'
-  }
-
-  useEffect(() => {
-    let firstFrame: number | null = null
-    let secondFrame: number | null = null
-    let timeout: ReturnType<typeof setTimeout> | null = null
-
-    if (visible) {
-      setIsMounted(true)
-      setIsReady(false)
-
-      firstFrame = requestAnimationFrame(() => {
-        secondFrame = requestAnimationFrame(() => {
-          timeout = setTimeout(() => {
-            setIsReady(true)
-          }, 40)
-        })
-      })
-    } else {
-      setIsReady(false)
-
-      timeout = setTimeout(() => {
-        setIsMounted(false)
-      }, 120)
-    }
-
-    return () => {
-      if (firstFrame !== null) {
-        cancelAnimationFrame(firstFrame)
-      }
-
-      if (secondFrame !== null) {
-        cancelAnimationFrame(secondFrame)
-      }
-
-      if (timeout !== null) {
-        clearTimeout(timeout)
-      }
-    }
-  }, [visible])
 
   function handleCancel() {
     if (!isConfirming) {
@@ -122,34 +66,16 @@ export function ConfirmationDialog({
     }
   }
 
-  if (!isMounted) {
-    return null
-  }
-
   return (
     <Modal
-      animationType="none"
+      animationType="fade"
       onRequestClose={handleCancel}
       transparent
-      visible={isMounted}
+      visible={visible}
       statusBarTranslucent
     >
-      <View
-        accessibilityViewIsModal={isReady}
-        pointerEvents={overlayPointerEvents}
-        style={[
-          styles.overlay,
-          {
-            opacity: overlayOpacity,
-          },
-        ]}
-      >
-        <BlurView
-          intensity={46}
-          pointerEvents="none"
-          style={styles.backdropBlur}
-          tint={scheme}
-        />
+      <View accessibilityViewIsModal style={styles.overlay}>
+        <BackdropBlur tint={scheme} />
         <Pressable
           accessibilityLabel="Закрыть подтверждение"
           style={[
@@ -200,6 +126,35 @@ export function ConfirmationDialog({
   )
 }
 
+type BackdropBlurProps = {
+  tint: 'dark' | 'light'
+}
+
+function BackdropBlur({
+  tint,
+}: BackdropBlurProps) {
+  if (Platform.OS === 'web') {
+    return (
+      <View
+        pointerEvents="none"
+        style={[
+          styles.backdropBlur,
+          styles.webBackdropBlur,
+        ]}
+      />
+    )
+  }
+
+  return (
+    <BlurView
+      intensity={46}
+      pointerEvents="none"
+      style={styles.backdropBlur}
+      tint={tint}
+    />
+  )
+}
+
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -209,6 +164,10 @@ const styles = StyleSheet.create({
   backdropBlur: {
     ...StyleSheet.absoluteFillObject,
   },
+  webBackdropBlur: {
+    backdropFilter: 'blur(22px) saturate(170%)',
+    WebkitBackdropFilter: 'blur(22px) saturate(170%)',
+  } as ViewStyle,
   backdrop: {
     ...StyleSheet.absoluteFillObject,
   },

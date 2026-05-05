@@ -33,6 +33,7 @@ type GlassPanelProps = PropsWithChildren<{
 
 type GlassPanelState = {
   backgroundColor: string
+  backdropFilter: string
   borderColor: string
   glassEffectStyle: GlassStyle
   intensity: number
@@ -58,6 +59,7 @@ export function GlassPanel({
 
   const panelStyle = [
     styles.panel,
+    getWebBackdropStyle(panelState.backdropFilter),
     {
       backgroundColor: panelState.backgroundColor,
       borderRadius,
@@ -98,6 +100,22 @@ export function GlassPanel({
     )
   }
 
+  if (Platform.OS === 'web') {
+    return (
+      <View style={panelStyle}>
+        {content}
+      </View>
+    )
+  }
+
+  if (Platform.OS === 'android') {
+    return (
+      <View style={panelStyle}>
+        {content}
+      </View>
+    )
+  }
+
   return (
     <BlurView
       intensity={panelState.intensity}
@@ -115,6 +133,7 @@ function getGlassPanelState(
 ): GlassPanelState {
   const state: GlassPanelState = {
     backgroundColor: palette.glass,
+    backdropFilter: 'blur(18px) saturate(170%)',
     borderColor: palette.glassBorder,
     glassEffectStyle: 'regular',
     intensity: 34,
@@ -125,6 +144,7 @@ function getGlassPanelState(
 
   if (variant === 'chrome') {
     state.backgroundColor = palette.glassChrome
+    state.backdropFilter = 'blur(24px) saturate(190%)'
     state.glassEffectStyle = 'clear'
     state.intensity = 52
     state.isInteractive = true
@@ -134,6 +154,7 @@ function getGlassPanelState(
 
   if (variant === 'modal') {
     state.backgroundColor = palette.glassStrong
+    state.backdropFilter = 'blur(28px) saturate(190%)'
     state.glassEffectStyle = 'regular'
     state.intensity = 64
     state.isInteractive = true
@@ -147,6 +168,17 @@ function getGlassPanelState(
   }
 
   return state
+}
+
+function getWebBackdropStyle(backdropFilter: string) {
+  if (Platform.OS !== 'web') {
+    return null
+  }
+
+  return {
+    backdropFilter,
+    WebkitBackdropFilter: backdropFilter,
+  } as ViewStyle
 }
 
 function canUseNativeGlass() {
