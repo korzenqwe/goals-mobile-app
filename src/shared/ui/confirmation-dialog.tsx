@@ -3,9 +3,6 @@ import {
   X,
 } from 'lucide-react-native'
 import {
-  BlurView,
-} from 'expo-blur'
-import {
   Modal,
   Pressable,
   StyleSheet,
@@ -73,12 +70,6 @@ export function ConfirmationDialog({
       statusBarTranslucent
     >
       <View accessibilityViewIsModal style={styles.overlay}>
-        <BlurView
-          intensity={42}
-          pointerEvents="none"
-          style={styles.backdropBlur}
-          tint={scheme}
-        />
         <Pressable
           accessibilityLabel="Закрыть подтверждение"
           style={[
@@ -134,9 +125,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: spacing.four,
-  },
-  backdropBlur: {
-    ...StyleSheet.absoluteFillObject,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
