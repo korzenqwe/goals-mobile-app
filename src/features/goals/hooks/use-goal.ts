@@ -18,11 +18,26 @@ import {
 } from '@/shared/db'
 
 export function useGoal(goalId: string) {
-  const [goal, setGoal] = useState<Goal | null>(null)
-  const [stats, setStats] = useState<GoalStats | null>(null)
-  const [isCompletedToday, setIsCompletedToday] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [
+    goal,
+    setGoal,
+  ] = useState<Goal | null>(null)
+  const [
+    stats,
+    setStats,
+  ] = useState<GoalStats | null>(null)
+  const [
+    isCompletedToday,
+    setIsCompletedToday,
+  ] = useState(false)
+  const [
+    error,
+    setError,
+  ] = useState<string | null>(null)
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true)
 
   const refresh = useCallback(async () => {
     if (!goalId) {
@@ -48,7 +63,10 @@ export function useGoal(goalId: string) {
         return
       }
 
-      const [nextStats, nextIsCompletedToday] = await Promise.all([
+      const [
+        nextStats,
+        nextIsCompletedToday,
+      ] = await Promise.all([
         goalsRepository.getGoalStats(goalId),
         goalsRepository.isCompletedOn(goalId, today),
       ])

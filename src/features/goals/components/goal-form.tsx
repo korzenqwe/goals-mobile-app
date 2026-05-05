@@ -44,8 +44,14 @@ export function GoalForm({
   submitLabel,
 }: GoalFormProps) {
   const theme = useAppTheme()
-  const [title, setTitle] = useState(initialValues?.title ?? '')
-  const [description, setDescription] = useState(initialValues?.description ?? '')
+  const [
+    title,
+    setTitle,
+  ] = useState(initialValues?.title ?? '')
+  const [
+    description,
+    setDescription,
+  ] = useState(initialValues?.description ?? '')
   const canSubmit = title.trim().length > 0 && !isSubmitting
   let errorContent = null
   let submitButtonLabel = submitLabel

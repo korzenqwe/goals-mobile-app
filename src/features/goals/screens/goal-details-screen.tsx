@@ -57,8 +57,14 @@ export function GoalDetailsScreen() {
     refresh,
     stats,
   } = useGoal(goalId)
-  const [actionError, setActionError] = useState<string | null>(null)
-  const [isTogglingToday, setIsTogglingToday] = useState(false)
+  const [
+    actionError,
+    setActionError,
+  ] = useState<string | null>(null)
+  const [
+    isTogglingToday,
+    setIsTogglingToday,
+  ] = useState(false)
   let CompletionIcon = Circle
   let completionAccessibilityLabel = 'Отметить сегодня'
   let completionLabel = 'Отметить'

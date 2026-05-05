@@ -50,11 +50,26 @@ export function EditGoalScreen() {
     goal,
     isLoading,
   } = useGoal(goalId)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
-  const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [
+    submitError,
+    setSubmitError,
+  ] = useState<string | null>(null)
+  const [
+    deleteError,
+    setDeleteError,
+  ] = useState<string | null>(null)
+  const [
+    isDeleteDialogVisible,
+    setIsDeleteDialogVisible,
+  ] = useState(false)
+  const [
+    isDeleting,
+    setIsDeleting,
+  ] = useState(false)
+  const [
+    isSubmitting,
+    setIsSubmitting,
+  ] = useState(false)
 
   async function handleSubmit(values: GoalFormValues) {
     setSubmitError(null)

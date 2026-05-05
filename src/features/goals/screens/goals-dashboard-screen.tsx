@@ -51,8 +51,14 @@ export function GoalsDashboardScreen() {
     refresh,
     refreshGoal,
   } = useGoalsList()
-  const [actionError, setActionError] = useState<string | null>(null)
-  const [togglingGoalId, setTogglingGoalId] = useState<string | null>(null)
+  const [
+    actionError,
+    setActionError,
+  ] = useState<string | null>(null)
+  const [
+    togglingGoalId,
+    setTogglingGoalId,
+  ] = useState<string | null>(null)
 
   async function handleToggleToday(goalId: string) {
     setActionError(null)

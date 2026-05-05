@@ -17,9 +17,18 @@ import {
 } from '@/shared/db'
 
 export function useGoalsList() {
-  const [goals, setGoals] = useState<GoalViewModel[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [
+    goals,
+    setGoals,
+  ] = useState<GoalViewModel[]>([])
+  const [
+    error,
+    setError,
+  ] = useState<string | null>(null)
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true)
 
   const refreshGoal = useCallback(async (goalId: string) => {
     const goal = await goalsRepository.getGoal(goalId)
@@ -75,7 +84,10 @@ export function useGoalsList() {
 
 async function buildGoalViewModel(goal: GoalViewModel['goal']): Promise<GoalViewModel> {
   const today = getLocalDateString()
-  const [stats, isCompletedToday] = await Promise.all([
+  const [
+    stats,
+    isCompletedToday,
+  ] = await Promise.all([
     goalsRepository.getGoalStats(goal.id),
     goalsRepository.isCompletedOn(goal.id, today),
   ])

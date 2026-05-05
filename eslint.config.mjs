@@ -9,6 +9,59 @@ import reactHooks from 'eslint-plugin-react-hooks'
 const configDirectory = fileURLToPath(new URL('.', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('./tsconfig.json', import.meta.url))
 const sourceFiles = ['**/*.{js,jsx,ts,tsx}']
+const arrayPatternNewlineRule = {
+  meta: {
+    type: 'layout',
+    fixable: 'whitespace',
+    schema: [],
+    messages: {
+      missingClosingLinebreak: 'A linebreak is required before "]" in array destructuring.',
+      missingOpeningLinebreak: 'A linebreak is required after "[" in array destructuring.',
+    },
+  },
+  create(context) {
+    const sourceCode = context.sourceCode
+
+    return {
+      ArrayPattern(node) {
+        if (node.elements.length === 0) {
+          return
+        }
+
+        const openBracket = sourceCode.getFirstToken(node)
+        const closeBracket = sourceCode.getLastToken(node)
+        const firstToken = sourceCode.getTokenAfter(openBracket)
+        const lastToken = sourceCode.getTokenBefore(closeBracket)
+
+        if (!openBracket || !closeBracket || !firstToken || !lastToken) {
+          return
+        }
+
+        if (openBracket.loc.end.line === firstToken.loc.start.line) {
+          context.report({
+            node,
+            loc: openBracket.loc,
+            messageId: 'missingOpeningLinebreak',
+            fix(fixer) {
+              return fixer.insertTextAfter(openBracket, '\n')
+            },
+          })
+        }
+
+        if (lastToken.loc.end.line === closeBracket.loc.start.line) {
+          context.report({
+            node,
+            loc: closeBracket.loc,
+            messageId: 'missingClosingLinebreak',
+            fix(fixer) {
+              return fixer.insertTextBefore(closeBracket, '\n')
+            },
+          })
+        }
+      },
+    }
+  },
+}
 const platformExtensions = [
   '.android.js',
   '.android.jsx',
@@ -67,6 +120,15 @@ export default antfu(
       'node/prefer-global/process': 'off',
       'perfectionist/sort-imports': 'off',
       'style/arrow-parens': 'off',
+      'style/array-element-newline': [
+        'error',
+        {
+          ArrayPattern: {
+            minItems: 1,
+            multiline: true,
+          },
+        },
+      ],
       'style/brace-style': [
         'error',
         '1tbs',
@@ -108,6 +170,11 @@ export default antfu(
     files: sourceFiles,
     plugins: {
       expo,
+      'local': {
+        rules: {
+          'array-pattern-newline': arrayPatternNewlineRule,
+        },
+      },
       'react-hooks': reactHooks,
     },
     settings: {
@@ -127,6 +194,7 @@ export default antfu(
       'expo/no-dynamic-env-var': 'warn',
       'expo/no-env-var-destructuring': 'warn',
       'expo/use-dom-exports': 'error',
+      'local/array-pattern-newline': 'error',
     },
   },
 )

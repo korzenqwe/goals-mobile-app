@@ -20,8 +20,14 @@ import {
 
 export function NewGoalScreen() {
   const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [
+    error,
+    setError,
+  ] = useState<string | null>(null)
+  const [
+    isSubmitting,
+    setIsSubmitting,
+  ] = useState(false)
 
   async function handleSubmit(values: GoalFormValues) {
     setError(null)

@@ -123,13 +123,21 @@ function maxLocalDate(first: LocalDateString, second: LocalDateString) {
 }
 
 function parseLocalDate(date: LocalDateString) {
-  const [year, month, day] = date.split('-').map(Number)
+  const [
+    year,
+    month,
+    day,
+  ] = date.split('-').map(Number)
 
   return new Date(year, month - 1, day)
 }
 
 function getUtcDayNumber(date: LocalDateString) {
-  const [year, month, day] = date.split('-').map(Number)
+  const [
+    year,
+    month,
+    day,
+  ] = date.split('-').map(Number)
 
   return Date.UTC(year, month - 1, day)
 }
