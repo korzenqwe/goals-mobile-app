@@ -1,9 +1,23 @@
 import type { ComponentType } from 'react'
-import { CalendarCheck2, Flame, Percent, Trophy } from 'lucide-react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  CalendarCheck2,
+  Flame,
+  Percent,
+  Trophy,
+} from 'lucide-react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
 import type { GoalStats } from '@/features/goals/domain/types'
-import { radii, spacing, typography, useAppTheme } from '@/shared/theme'
+import {
+  radii,
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
 
 type GoalStatsPanelProps = {
   stats: GoalStats

@@ -1,8 +1,20 @@
-import type { PropsWithChildren, ReactNode } from 'react'
-import { ScrollView, StyleSheet, useColorScheme, View } from 'react-native'
+import type {
+  PropsWithChildren,
+  ReactNode,
+} from 'react'
+import {
+  ScrollView,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { colors, resolveColorScheme, spacing } from '@/shared/theme'
+import {
+  colors,
+  resolveColorScheme,
+  spacing,
+} from '@/shared/theme'
 
 type AppScreenProps = PropsWithChildren<{
   footer?: ReactNode

@@ -1,7 +1,13 @@
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useState } from 'react'
+import {
+  useCallback,
+  useState,
+} from 'react'
 
-import type { Goal, GoalStats } from '@/features/goals/domain/types'
+import type {
+  Goal,
+  GoalStats,
+} from '@/features/goals/domain/types'
 import { getLocalDateString } from '@/shared/date'
 import { goalsRepository } from '@/shared/db'
 

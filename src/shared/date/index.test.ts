@@ -1,4 +1,8 @@
-import { describe, expect, test } from 'bun:test'
+import {
+  describe,
+  expect,
+  test,
+} from 'bun:test'
 
 import { calculateCompletionStats } from './index'
 

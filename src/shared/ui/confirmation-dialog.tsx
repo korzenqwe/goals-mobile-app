@@ -1,7 +1,20 @@
-import { AlertTriangle, X } from 'lucide-react-native'
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
+import {
+  AlertTriangle,
+  X,
+} from 'lucide-react-native'
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
 import { GlassPanel } from '@/shared/ui/glass-panel'
 import { IconButton } from '@/shared/ui/icon-button'
 

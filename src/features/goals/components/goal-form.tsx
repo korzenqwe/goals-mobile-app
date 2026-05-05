@@ -1,9 +1,21 @@
 import { Check } from 'lucide-react-native'
 import { useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme'
-import { GlassPanel, IconButton } from '@/shared/ui'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
+import {
+  GlassPanel,
+  IconButton,
+} from '@/shared/ui'
 
 export type GoalFormValues = {
   title: string

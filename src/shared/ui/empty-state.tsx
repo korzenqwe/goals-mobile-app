@@ -1,7 +1,14 @@
 import type { ComponentType } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+} from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
 import { GlassPanel } from '@/shared/ui/glass-panel'
 import { IconButton } from '@/shared/ui/icon-button'
 

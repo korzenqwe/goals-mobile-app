@@ -1,9 +1,30 @@
-import { CalendarCheck2, CheckCircle2, Circle, MoreHorizontal } from 'lucide-react-native'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import {
+  CalendarCheck2,
+  CheckCircle2,
+  Circle,
+  MoreHorizontal,
+} from 'lucide-react-native'
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
-import type { Goal, GoalStats } from '@/features/goals/domain/types'
-import { radii, spacing, typography, useAppTheme } from '@/shared/theme'
-import { GlassPanel, IconButton } from '@/shared/ui'
+import type {
+  Goal,
+  GoalStats,
+} from '@/features/goals/domain/types'
+import {
+  radii,
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
+import {
+  GlassPanel,
+  IconButton,
+} from '@/shared/ui'
 
 type GoalCardProps = {
   goal: Goal

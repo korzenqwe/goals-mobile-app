@@ -1,6 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
-import { radii, spacing, typography, useAppTheme } from '@/shared/theme'
+import {
+  radii,
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
 
 type SegmentedControlItem<TValue extends string> = {
   label: string

@@ -1,15 +1,33 @@
 import * as Haptics from 'expo-haptics'
 import { useRouter } from 'expo-router'
-import { Plus, RefreshCw, Target } from 'lucide-react-native'
+import {
+  Plus,
+  RefreshCw,
+  Target,
+} from 'lucide-react-native'
 import { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
 import { GoalCard } from '@/features/goals/components/goal-card'
 import { useGoalsList } from '@/features/goals/hooks/use-goals-list'
 import { getLocalDateString } from '@/shared/date'
 import { goalsRepository } from '@/shared/db'
-import { spacing, typography, useAppTheme } from '@/shared/theme'
-import { AppScreen, EmptyState, FloatingActionBar, IconButton, PageHeader } from '@/shared/ui'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
+import {
+  AppScreen,
+  EmptyState,
+  FloatingActionBar,
+  IconButton,
+  PageHeader,
+} from '@/shared/ui'
 
 export function GoalsDashboardScreen() {
   const router = useRouter()

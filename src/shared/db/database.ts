@@ -1,4 +1,7 @@
-import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite'
+import {
+  openDatabaseAsync,
+  type SQLiteDatabase,
+} from 'expo-sqlite'
 
 import { migrations } from '@/shared/db/migrations'
 import { DATABASE_NAME } from '@/shared/db/schema'

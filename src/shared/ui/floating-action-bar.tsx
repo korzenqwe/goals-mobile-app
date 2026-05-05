@@ -1,5 +1,8 @@
 import type { PropsWithChildren } from 'react'
-import { StyleSheet, View } from 'react-native'
+import {
+  StyleSheet,
+  View,
+} from 'react-native'
 
 import { spacing } from '@/shared/theme'
 import { GlassPanel } from '@/shared/ui/glass-panel'

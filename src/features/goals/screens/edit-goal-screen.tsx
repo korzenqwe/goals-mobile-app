@@ -1,14 +1,34 @@
 import * as Haptics from 'expo-haptics'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import {
+  useLocalSearchParams,
+  useRouter,
+} from 'expo-router'
 import { Trash2 } from 'lucide-react-native'
 import { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
-import { GoalForm, type GoalFormValues } from '@/features/goals/components/goal-form'
+import {
+  GoalForm,
+  type GoalFormValues,
+} from '@/features/goals/components/goal-form'
 import { useGoal } from '@/features/goals/hooks/use-goal'
 import { goalsRepository } from '@/shared/db'
-import { spacing, typography, useAppTheme } from '@/shared/theme'
-import { AppScreen, ConfirmationDialog, GlassPanel, IconButton, PageHeader } from '@/shared/ui'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
+import {
+  AppScreen,
+  ConfirmationDialog,
+  GlassPanel,
+  IconButton,
+  PageHeader,
+} from '@/shared/ui'
 
 export function EditGoalScreen() {
   const router = useRouter()

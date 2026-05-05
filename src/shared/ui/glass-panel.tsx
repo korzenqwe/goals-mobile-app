@@ -8,7 +8,12 @@ import {
   type ViewStyle,
 } from 'react-native'
 
-import { colors, radii, resolveColorScheme, spacing } from '@/shared/theme'
+import {
+  colors,
+  radii,
+  resolveColorScheme,
+  spacing,
+} from '@/shared/theme'
 
 type GlassPanelProps = PropsWithChildren<{
   style?: StyleProp<ViewStyle>

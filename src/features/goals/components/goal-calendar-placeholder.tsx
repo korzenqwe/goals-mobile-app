@@ -1,7 +1,15 @@
 import { CalendarDays } from 'lucide-react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
-import { spacing, typography, useAppTheme } from '@/shared/theme'
+import {
+  spacing,
+  typography,
+  useAppTheme,
+} from '@/shared/theme'
 import { GlassPanel } from '@/shared/ui'
 
 export function GoalCalendarPlaceholder() {

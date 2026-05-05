@@ -9,7 +9,13 @@ import {
   type ViewStyle,
 } from 'react-native'
 
-import { colors, radii, resolveColorScheme, spacing, typography } from '@/shared/theme'
+import {
+  colors,
+  radii,
+  resolveColorScheme,
+  spacing,
+  typography,
+} from '@/shared/theme'
 
 type IconButtonProps = {
   accessibilityLabel?: string
