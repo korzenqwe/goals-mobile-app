@@ -1,6 +1,5 @@
 import { CalendarCheck2, CheckCircle2, Circle, MoreHorizontal } from 'lucide-react-native'
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
-import type { StyleProp, ViewStyle } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import type { Goal, GoalStats } from '@/features/goals/domain/types'
 import { radii, spacing, typography, useAppTheme } from '@/shared/theme'
@@ -10,7 +9,6 @@ type GoalCardProps = {
   goal: Goal
   isCompletedToday?: boolean
   isTogglingToday?: boolean
-  isUpdating?: boolean
   stats?: GoalStats
   onPress?: () => void
   onMenuPress?: () => void
@@ -21,35 +19,22 @@ export function GoalCard({
   goal,
   isCompletedToday = false,
   isTogglingToday = false,
-  isUpdating = false,
   stats,
   onPress,
   onMenuPress,
   onToggleToday,
 }: GoalCardProps) {
   const theme = useAppTheme()
-  const cardStyle: StyleProp<ViewStyle> = [styles.card]
   let CompletionIcon = Circle
   let completionAccessibilityLabel = 'Отметить сегодня'
   let completionLabel = 'Отметить'
-  let completionVariant: 'ghost' | 'primary' = 'primary'
+  const completionVariant = 'soft'
   let descriptionContent = null
-  let updatingIndicator = null
 
   if (isCompletedToday) {
     CompletionIcon = CheckCircle2
     completionAccessibilityLabel = 'Снять отметку за сегодня'
     completionLabel = 'Снять отметку'
-    completionVariant = 'ghost'
-  }
-
-  if (isUpdating) {
-    cardStyle.push({
-      backgroundColor: theme.accentSoft,
-      borderColor: theme.accent,
-    })
-    completionLabel = 'Обновляем...'
-    updatingIndicator = <ActivityIndicator color={theme.accent} size="small" />
   }
 
   if (goal.description) {
@@ -61,11 +46,10 @@ export function GoalCard({
   }
 
   return (
-    <GlassPanel style={cardStyle}>
+    <GlassPanel style={styles.card}>
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
-          disabled={isUpdating}
           onPress={onPress}
           style={styles.titleBlock}
         >
@@ -73,10 +57,8 @@ export function GoalCard({
           {descriptionContent}
         </Pressable>
         <View style={styles.headerActions}>
-          {updatingIndicator}
           <IconButton
             accessibilityLabel="Действия с целью"
-            disabled={isUpdating}
             icon={MoreHorizontal}
             onPress={onMenuPress}
             variant="ghost"
@@ -87,11 +69,18 @@ export function GoalCard({
       <View style={styles.footer}>
         <Pressable
           accessibilityRole="button"
-          disabled={isUpdating}
           onPress={onPress}
           style={styles.footerInfo}
         >
-          <View style={[styles.statPill, { backgroundColor: theme.accentSoft }]}>
+          <View
+            style={[
+              styles.statPill,
+              {
+                backgroundColor: theme.accentSoft,
+                borderColor: theme.border,
+              },
+            ]}
+          >
             <CalendarCheck2 color={theme.accent} size={16} strokeWidth={2.4} />
             <Text style={[styles.statText, { color: theme.accent }]}>
               {stats?.currentStreak ?? 0} дней
@@ -103,10 +92,11 @@ export function GoalCard({
         </Pressable>
         <IconButton
           accessibilityLabel={completionAccessibilityLabel}
-          disabled={isTogglingToday || isUpdating || !onToggleToday}
+          disabled={isTogglingToday || !onToggleToday}
           icon={CompletionIcon}
           label={completionLabel}
           onPress={onToggleToday}
+          style={styles.completionButton}
           variant={completionVariant}
         />
       </View>
@@ -165,6 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.one,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.full,
     paddingHorizontal: spacing.three,
     paddingVertical: spacing.one,
@@ -175,5 +166,8 @@ const styles = StyleSheet.create({
   },
   status: {
     fontSize: typography.caption.fontSize,
+  },
+  completionButton: {
+    minWidth: 148,
   },
 })

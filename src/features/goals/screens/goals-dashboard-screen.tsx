@@ -89,7 +89,6 @@ export function GoalsDashboardScreen() {
               goal={goal}
               isCompletedToday={isCompletedToday}
               isTogglingToday={isGoalUpdating}
-              isUpdating={isGoalUpdating}
               key={goal.id}
               onPress={() => router.push({ pathname: '/goals/[id]', params: { id: goal.id } })}
               onMenuPress={() =>

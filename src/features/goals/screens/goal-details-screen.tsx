@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { CheckCircle2, Circle, Edit3 } from 'lucide-react-native'
 import { useState } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 
 import { GoalCalendarPlaceholder } from '@/features/goals/components/goal-calendar-placeholder'
 import { GoalStatsPanel } from '@/features/goals/components/goal-stats-panel'
@@ -23,7 +23,7 @@ export function GoalDetailsScreen() {
   let CompletionIcon = Circle
   let completionAccessibilityLabel = 'Отметить сегодня'
   let completionLabel = 'Отметить'
-  let completionVariant: 'ghost' | 'primary' = 'primary'
+  const completionVariant = 'soft'
   let title = 'Детали цели'
   let subtitle: string | undefined
   let errorContent = null
@@ -33,7 +33,6 @@ export function GoalDetailsScreen() {
     CompletionIcon = CheckCircle2
     completionAccessibilityLabel = 'Снять отметку за сегодня'
     completionLabel = 'Снять отметку'
-    completionVariant = 'ghost'
   }
 
   if (goal) {
@@ -91,6 +90,7 @@ export function GoalDetailsScreen() {
         icon={CompletionIcon}
         label={completionLabel}
         onPress={() => void handleToggleToday()}
+        style={styles.completionButton}
         variant={completionVariant}
       />
       <IconButton
@@ -119,3 +119,9 @@ export function GoalDetailsScreen() {
     </AppScreen>
   )
 }
+
+const styles = StyleSheet.create({
+  completionButton: {
+    minWidth: 148,
+  },
+})

@@ -11,6 +11,7 @@ export type GoalFormValues = {
 }
 
 type GoalFormProps = {
+  autoFocusTitle?: boolean
   error?: string | null
   initialValues?: Partial<GoalFormValues>
   isSubmitting?: boolean
@@ -19,6 +20,7 @@ type GoalFormProps = {
 }
 
 export function GoalForm({
+  autoFocusTitle = false,
   error,
   initialValues,
   isSubmitting = false,
@@ -45,7 +47,7 @@ export function GoalForm({
       <View style={styles.field}>
         <Text style={[styles.label, { color: theme.text }]}>Название</Text>
         <TextInput
-          autoFocus
+          autoFocus={autoFocusTitle}
           maxLength={80}
           onChangeText={setTitle}
           placeholder="Например, читать каждый день"

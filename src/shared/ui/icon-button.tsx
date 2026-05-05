@@ -1,5 +1,13 @@
 import type { ComponentType } from 'react'
-import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native'
+import {
+  Pressable,
+  type StyleProp,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+  type ViewStyle,
+} from 'react-native'
 
 import { colors, radii, resolveColorScheme, spacing, typography } from '@/shared/theme'
 
@@ -9,7 +17,8 @@ type IconButtonProps = {
   icon: ComponentType<{ color?: string, size?: number, strokeWidth?: number }>
   label?: string
   onPress?: () => void
-  variant?: 'danger' | 'primary' | 'ghost'
+  style?: StyleProp<ViewStyle>
+  variant?: 'danger' | 'primary' | 'ghost' | 'soft'
 }
 
 export function IconButton({
@@ -18,16 +27,22 @@ export function IconButton({
   icon: Icon,
   label,
   onPress,
+  style,
   variant = 'primary',
 }: IconButtonProps) {
   const scheme = resolveColorScheme(useColorScheme())
   const palette = colors[scheme]
   const isGhost = variant === 'ghost'
   const isDanger = variant === 'danger'
+  const isSoft = variant === 'soft'
   let tintColor: string = '#FFFFFF'
 
   if (isGhost) {
     tintColor = palette.textSecondary
+  }
+
+  if (isSoft) {
+    tintColor = palette.accent
   }
 
   return (
@@ -42,9 +57,11 @@ export function IconButton({
           disabled,
           isDanger,
           isGhost,
+          isSoft,
           palette,
           pressed,
         }),
+        style,
       ]}
     >
       <View style={styles.content}>
@@ -59,6 +76,7 @@ type ButtonStateStyleInput = {
   disabled: boolean
   isDanger: boolean
   isGhost: boolean
+  isSoft: boolean
   palette: typeof colors.light | typeof colors.dark
   pressed: boolean
 }
@@ -67,18 +85,26 @@ function getButtonStateStyle({
   disabled,
   isDanger,
   isGhost,
+  isSoft,
   palette,
   pressed,
 }: ButtonStateStyleInput) {
   let backgroundColor: string = palette.accent
+  let borderColor: string = 'transparent'
   let opacity = 1
 
   if (isDanger) {
     backgroundColor = palette.danger
   }
 
+  if (isSoft) {
+    backgroundColor = palette.accentSoft
+    borderColor = palette.border
+  }
+
   if (isGhost) {
     backgroundColor = 'transparent'
+    borderColor = 'transparent'
   }
 
   if (pressed) {
@@ -86,11 +112,12 @@ function getButtonStateStyle({
   }
 
   if (disabled) {
-    opacity = 0.42
+    opacity = 0.58
   }
 
   return {
     backgroundColor,
+    borderColor,
     opacity,
   }
 }
@@ -107,6 +134,7 @@ const styles = StyleSheet.create({
   button: {
     minHeight: 44,
     justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.full,
     paddingHorizontal: spacing.three,
   },

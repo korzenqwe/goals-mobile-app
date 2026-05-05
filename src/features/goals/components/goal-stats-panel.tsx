@@ -34,8 +34,18 @@ function StatTile({ icon: Icon, label, value }: StatTileProps) {
   const theme = useAppTheme()
 
   return (
-    <View style={[styles.tile, { backgroundColor: theme.surface }]}>
-      <Icon color={theme.accent} size={20} strokeWidth={2.4} />
+    <View
+      style={[
+        styles.tile,
+        {
+          backgroundColor: theme.surfaceElevated,
+          borderColor: theme.border,
+        },
+      ]}
+    >
+      <View style={[styles.iconFrame, { backgroundColor: theme.accentSoft }]}>
+        <Icon color={theme.accent} size={18} strokeWidth={2.4} />
+      </View>
       <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
       <Text style={[styles.label, { color: theme.textSecondary }]}>{label}</Text>
     </View>
@@ -52,11 +62,21 @@ const styles = StyleSheet.create({
     flexBasis: '48%',
     flexGrow: 1,
     gap: spacing.one,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radii.large,
     padding: spacing.three,
   },
+  iconFrame: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.full,
+    marginBottom: spacing.one,
+  },
   value: {
     fontSize: 26,
+    lineHeight: 30,
     fontWeight: '800',
   },
   label: {

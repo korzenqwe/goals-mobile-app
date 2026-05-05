@@ -37,6 +37,7 @@ export function NewGoalScreen() {
     <AppScreen scroll>
       <PageHeader title="Новая цель" showBackButton />
       <GoalForm
+        autoFocusTitle
         error={error}
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
